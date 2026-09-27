@@ -23,6 +23,8 @@ struct VideoPlayerSettingsView: View {
 
     @Default(.VideoPlayer.videoPlayerType)
     private var videoPlayerType
+    @Default(.VideoPlayer.playIntros)
+    private var playIntros
 
     // MARK: - Button Defaults
 
@@ -143,6 +145,8 @@ struct VideoPlayerSettingsView: View {
             ChevronButton(L10n.playbackQuality) {
                 router.route(to: .playbackQualitySettings)
             }
+
+            Toggle(L10n.playIntros, isOn: $playIntros)
         } learnMore: {
             LabeledContent(
                 L10n.vlc,
@@ -151,6 +155,10 @@ struct VideoPlayerSettingsView: View {
             LabeledContent(
                 L10n.native,
                 value: L10n.playerNativeDescription
+            )
+            LabeledContent(
+                L10n.playIntros,
+                value: L10n.playIntrosDescription
             )
         }
     }

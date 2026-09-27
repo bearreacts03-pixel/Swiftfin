@@ -41,15 +41,30 @@ struct PlayButton: View {
             return
         }
 
-        let queue: (any MediaPlayerQueue)? = mediaPlayerItemProvider.item.type == .episode ?
+        let innerQueue: (any MediaPlayerQueue)? = mediaPlayerItemProvider.item.type == .episode ?
             EpisodeMediaPlayerQueue(episode: mediaPlayerItemProvider.item) : nil
 
-        router.route(
-            to: .videoPlayer(
-                provider: mediaPlayerItemProvider,
-                queue: queue
-            )
-        )
+        Task {
+            if let introProvider = await IntroMediaPlayerQueue.introProvider(for: mediaPlayerItemProvider.item) {
+                let introQueue = IntroMediaPlayerQueue(
+                    featureProvider: mediaPlayerItemProvider,
+                    innerQueue: innerQueue
+                )
+                router.route(
+                    to: .videoPlayer(
+                        provider: introProvider,
+                        queue: introQueue
+                    )
+                )
+            } else {
+                router.route(
+                    to: .videoPlayer(
+                        provider: mediaPlayerItemProvider,
+                        queue: innerQueue
+                    )
+                )
+            }
+        }
     }
 
     var body: some View {

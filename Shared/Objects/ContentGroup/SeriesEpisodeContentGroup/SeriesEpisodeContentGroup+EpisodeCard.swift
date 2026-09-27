@@ -54,16 +54,32 @@ extension SeriesEpisodeContentGroup {
                 subHeader: episode.episodeLocator ?? .emptyDash,
                 content: episodeContent,
                 artworkAction: {
-                    guard let provider = episode.getPlaybackItemProvider(userSession: nil) else {
+                    guard let featureProvider = episode.getPlaybackItemProvider(userSession: nil) else {
                         return
                     }
 
-                    router.route(
-                        to: .videoPlayer(
-                            provider: provider,
-                            queue: EpisodeMediaPlayerQueue(episode: episode)
-                        )
-                    )
+                    Task {
+                        if let introProvider = await IntroMediaPlayerQueue.introProvider(for: episode) {
+                            let innerQueue = EpisodeMediaPlayerQueue(episode: episode)
+                            let introQueue = IntroMediaPlayerQueue(
+                                featureProvider: featureProvider,
+                                innerQueue: innerQueue
+                            )
+                            router.route(
+                                to: .videoPlayer(
+                                    provider: introProvider,
+                                    queue: introQueue
+                                )
+                            )
+                        } else {
+                            router.route(
+                                to: .videoPlayer(
+                                    provider: featureProvider,
+                                    queue: EpisodeMediaPlayerQueue(episode: episode)
+                                )
+                            )
+                        }
+                    }
                 },
                 contentAction: {
                     router.route(to: .item(item: episode), in: namespace)

@@ -228,6 +228,16 @@ final class MediaPlayerManager: ViewModel {
 
     @Function(\Action.Cases.ended)
     private func _ended() async throws {
+        // An intro always continues into its feature item, regardless
+        // of the autoplay setting or whether the intro reports a runtime.
+        if queue?.id == IntroMediaPlayerQueue.identifier, let featureItem = queue?.nextItem {
+            if let runtime = item.runtime, (runtime - seconds) > .seconds(1) {
+                return
+            }
+            await self.playNewItem(provider: featureItem)
+            return
+        }
+
         // TODO: change to observe given seconds against runtime
         //       instead of sent action?
 

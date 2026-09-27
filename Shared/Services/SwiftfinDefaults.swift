@@ -286,6 +286,10 @@ extension Defaults.Keys {
             )
         }
 
+        static var playIntros: Key<Bool> {
+            UserKey("playIntros", default: true)
+        }
+
         static var resumeOffset: Key<Int> {
             UserKey("resumeOffset", default: 0)
         }

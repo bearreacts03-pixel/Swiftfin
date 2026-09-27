@@ -1246,6 +1246,10 @@ internal enum L10n {
   internal static let playerVlcDescription = L10n.tr("Localizable", "playerVlcDescription", fallback: "Uses SwiftVLC and libVLC 4 to provide compatibility with nearly any file type.")
   /// Play From beginning
   internal static let playFromBeginning = L10n.tr("Localizable", "playFromBeginning", fallback: "Play From beginning")
+  /// Play intros
+  internal static let playIntros = L10n.tr("Localizable", "playIntros", fallback: "Play intros")
+  /// Plays intro videos provided by your server, such as prerolls from a server plugin, before movies and when you start an episode.
+  internal static let playIntrosDescription = L10n.tr("Localizable", "playIntrosDescription", fallback: "Plays intro videos provided by your server, such as prerolls from a server plugin, before movies and when you start an episode.")
   /// Playlist
   internal static let playlist = L10n.tr("Localizable", "playlist", fallback: "Playlist")
   /// Playlists
