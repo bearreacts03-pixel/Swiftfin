@@ -19,6 +19,9 @@ struct PlayButton: View {
     @ObservedObject
     var provider: ItemContentGroupProvider
 
+    /// Shows a compact round button that always starts from the beginning.
+    var fromBeginning: Bool = false
+
     @Router
     private var router
 
@@ -53,6 +56,28 @@ struct PlayButton: View {
     }
 
     var body: some View {
+        if fromBeginning {
+            playFromBeginningButton
+        } else {
+            playButton
+        }
+    }
+
+    private var playFromBeginningButton: some View {
+        Button {
+            play(fromBeginning: true)
+        } label: {
+            Label(L10n.playFromBeginning, systemImage: "gobackward")
+                .labelStyle(ItemActionButtonLabelStyle())
+        }
+        .buttonBorderShape(.capsule)
+        .buttonStyle(BasicHoverButtonStyle())
+        .font(.title3)
+        .fontWeight(.semibold)
+        .disabled(provider.mediaPlayerItemProvider == nil)
+    }
+
+    private var playButton: some View {
         Button {
             play()
         } label: {

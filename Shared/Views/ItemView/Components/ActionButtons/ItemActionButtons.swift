@@ -9,7 +9,7 @@
 import Defaults
 import SwiftUI
 
-private struct ItemActionButtonLabelStyle: LabelStyle {
+struct ItemActionButtonLabelStyle: LabelStyle {
 
     @Environment(\.isSelected)
     private var isSelected
