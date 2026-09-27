@@ -513,6 +513,12 @@ final class MediaPlayerManager: ViewModel {
             }
         )
 
+        // A rebuilt intro (e.g. after an audio or subtitle change)
+        // must stay unreported, like the original.
+        if isPlayingIntro {
+            newItem.observers.removeAll { $0 is MediaProgressObserver }
+        }
+
         logger.info(
             "Built new playback item",
             metadata: [
