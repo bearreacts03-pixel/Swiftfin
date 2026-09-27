@@ -408,6 +408,7 @@ final class MediaPlayerManager: ViewModel {
             return
         }
         self.initialMediaPlayerItemProvider = nil
+        ThemeSongPlayer.shared.stop()
         playbackItem = try await startingPlaybackItem(for: initialMediaPlayerItemProvider)
     }
 

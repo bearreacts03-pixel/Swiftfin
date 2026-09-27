@@ -13,6 +13,8 @@ struct CustomizeSettingsView: View {
 
     @Default(.Customization.Search.enabledDrawerFilters)
     private var searchEnabledDrawerFilters
+    @Default(.Customization.playThemeSongs)
+    private var playThemeSongs
 
     #if os(tvOS)
     @Default(.Customization.tabBarPlacement)
@@ -38,6 +40,12 @@ struct CustomizeSettingsView: View {
 
             } header: {
                 Text(L10n.filters)
+            }
+
+            Section {
+                Toggle(L10n.playThemeSongs, isOn: $playThemeSongs)
+            } footer: {
+                Text(L10n.playThemeSongsDescription)
             }
 
             ChevronButton(L10n.items) {

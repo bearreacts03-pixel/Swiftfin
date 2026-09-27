@@ -1262,6 +1262,10 @@ internal enum L10n {
   internal static let playNextItem = L10n.tr("Localizable", "playNextItem", fallback: "Play next item")
   /// Play previous item
   internal static let playPreviousItem = L10n.tr("Localizable", "playPreviousItem", fallback: "Play previous item")
+  /// Play theme songs
+  internal static let playThemeSongs = L10n.tr("Localizable", "playThemeSongs", fallback: "Play theme songs")
+  /// Plays a movie's or show's theme song on its page, such as the songs added by the Themerr plugin.
+  internal static let playThemeSongsDescription = L10n.tr("Localizable", "playThemeSongsDescription", fallback: "Plays a movie\'s or show\'s theme song on its page, such as the songs added by the Themerr plugin.")
   /// Portrait
   internal static let portrait = L10n.tr("Localizable", "portrait", fallback: "Portrait")
   /// Posters

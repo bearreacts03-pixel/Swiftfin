@@ -144,6 +144,12 @@ struct ItemView: View {
         .onFirstAppear {
             viewModel.refresh()
         }
+        .onAppear {
+            ThemeSongPlayer.shared.play(for: provider.item)
+        }
+        .onDisappear {
+            ThemeSongPlayer.shared.stopSoon()
+        }
         .environmentObject(focusCoordinator)
         .confirmationDialog(
             L10n.deleteItemConfirmationMessage,

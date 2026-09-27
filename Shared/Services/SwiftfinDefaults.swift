@@ -111,6 +111,10 @@ extension Defaults.Keys {
 
     enum Customization {
 
+        static var playThemeSongs: Key<Bool> {
+            UserKey("playThemeSongs", default: true)
+        }
+
         static var itemViewType: Key<ItemViewType> {
             UserKey("mediaItemViewType", default: .enhanced)
         }
