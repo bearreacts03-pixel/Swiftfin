@@ -927,7 +927,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.4.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.swiftfin;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.bearfin;
 				PRODUCT_NAME = Swiftfin;
 				SDKROOT = appletvos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -959,7 +959,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.4.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.swiftfin;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.bearfin;
 				PRODUCT_NAME = Swiftfin;
 				SDKROOT = appletvos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1128,7 +1128,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.swiftfinios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.bearfin;
 				PRODUCT_NAME = Swiftfin;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;
@@ -1169,7 +1169,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.swiftfinios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bearreacts.bearfin;
 				PRODUCT_NAME = Swiftfin;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTS_MACCATALYST = NO;

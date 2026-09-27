@@ -134,7 +134,7 @@ extension VideoPlayer.PlaybackControls {
                     Text(L10n.nextUp)
                         .font(.callout)
                         .fontWeight(.semibold)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.bearfinYellow)
 
                     Text(item.seriesName ?? item.displayTitle)
                         .font(.title2)

@@ -12,6 +12,12 @@ extension Color {
 
     static let jellyfinPurple = Color(red: 172 / 255, green: 92 / 255, blue: 195 / 255, opacity: 1)
 
+    /// Bear Reacts green: Bearfin's main brand and accent color.
+    static let bearfinGreen = Color(red: 78 / 255, green: 138 / 255, blue: 44 / 255, opacity: 1)
+
+    /// Bear Reacts yellow: Bearfin's highlight color.
+    static let bearfinYellow = Color(red: 228 / 255, green: 240 / 255, blue: 60 / 255, opacity: 1)
+
     var uiColor: UIColor {
         UIColor(self)
     }

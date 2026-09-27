@@ -15,20 +15,25 @@ struct AboutAppView: View {
     private var router
 
     var body: some View {
-        Form(image: .jellyfinBlobBlue) {
+        Form(image: .bearfinLogo) {
 
             #if os(iOS)
             Section {
                 VStack(alignment: .center, spacing: 10) {
 
-                    Image(.jellyfinBlobBlue)
+                    Image(.bearfinLogo)
                         .resizable()
                         .aspectRatio(1, contentMode: .fit)
                         .frame(height: 150)
 
-                    Text(verbatim: "Swiftfin")
+                    Text(verbatim: "Bearfin")
                         .fontWeight(.semibold)
                         .font(.title2)
+
+                    // swiftlint:disable:next hard_coded_display_string
+                    Text(verbatim: "Based on Swiftfin by the Jellyfin community")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .listRowBackground(Color.clear)
