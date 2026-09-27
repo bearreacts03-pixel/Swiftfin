@@ -25,6 +25,8 @@ struct VideoPlayerSettingsView: View {
     private var videoPlayerType
     @Default(.VideoPlayer.playIntros)
     private var playIntros
+    @Default(.VideoPlayer.skipCredits)
+    private var skipCredits
 
     // MARK: - Button Defaults
 
@@ -147,6 +149,10 @@ struct VideoPlayerSettingsView: View {
             }
 
             Toggle(L10n.playIntros, isOn: $playIntros)
+
+            if UIDevice.isTV {
+                Toggle(L10n.skipCredits, isOn: $skipCredits)
+            }
         } learnMore: {
             LabeledContent(
                 L10n.vlc,
@@ -159,6 +165,10 @@ struct VideoPlayerSettingsView: View {
             LabeledContent(
                 L10n.playIntros,
                 value: L10n.playIntrosDescription
+            )
+            LabeledContent(
+                L10n.skipCredits,
+                value: L10n.skipCreditsDescription
             )
         }
     }

@@ -1584,6 +1584,10 @@ internal enum L10n {
   internal static let simple = L10n.tr("Localizable", "simple", fallback: "Simple")
   /// Size
   internal static let size = L10n.tr("Localizable", "size", fallback: "Size")
+  /// Skip credits
+  internal static let skipCredits = L10n.tr("Localizable", "skipCredits", fallback: "Skip credits")
+  /// When the end credits start, counts down and plays the next episode. Requires a server plugin that detects credits, such as Intro Skipper.
+  internal static let skipCreditsDescription = L10n.tr("Localizable", "skipCreditsDescription", fallback: "When the end credits start, counts down and plays the next episode. Requires a server plugin that detects credits, such as Intro Skipper.")
   /// Skip intro
   internal static let skipIntro = L10n.tr("Localizable", "skipIntro", fallback: "Skip intro")
   /// Slider
@@ -1624,6 +1628,10 @@ internal enum L10n {
   internal static let start = L10n.tr("Localizable", "start", fallback: "Start")
   /// Start date
   internal static let startDate = L10n.tr("Localizable", "startDate", fallback: "Start date")
+  /// Starting in %@
+  internal static func startingIn(_ p1: Any) -> String {
+    return L10n.tr("Localizable", "startingIn", String(describing: p1), fallback: "Starting in %@")
+  }
   /// Start time
   internal static let startTime = L10n.tr("Localizable", "startTime", fallback: "Start time")
   /// Status

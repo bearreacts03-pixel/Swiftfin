@@ -106,6 +106,7 @@ final class MediaPlayerManager: ViewModel {
                 seconds = playbackItem.baseItem.startSeconds ?? .zero
                 playbackItem.manager = self
                 setSupplements()
+                resetCredits(for: playbackItem)
 
                 logger.info(
                     "Playing new item",
@@ -233,6 +234,7 @@ final class MediaPlayerManager: ViewModel {
         super.init()
 
         self.queue?.manager = self
+        observeSecondsForCredits()
     }
 
     init(
@@ -245,6 +247,7 @@ final class MediaPlayerManager: ViewModel {
         super.init()
 
         self.queue?.manager = self
+        observeSecondsForCredits()
         self.playbackItem = playbackItem
     }
 
@@ -314,6 +317,8 @@ final class MediaPlayerManager: ViewModel {
 
     @Function(\Action.Cases.playNewItem)
     private func _playNewItem(_ provider: MediaPlayerItemProvider) async throws {
+        cancelCreditsCountdown()
+
         // Intros only play when a playback session starts, so anything
         // played within the session (autoplay, next/previous, the episode
         // picker, or the feature after its intro) starts directly.
@@ -429,6 +434,153 @@ final class MediaPlayerManager: ViewModel {
         return try await provider()
     }
 
+    // MARK: - Credits
+
+    /// How long the Up Next countdown runs once the end credits start.
+    private static let creditsCountdownLength = 5
+
+    /// The countdown has an on-screen card only on tvOS so far.
+    private static let supportsCreditsCountdown: Bool = {
+        #if os(tvOS)
+        true
+        #else
+        false
+        #endif
+    }()
+
+    /// When the current item's end credits begin, from the server's media segments.
+    private var creditsStart: Duration?
+    private var creditsLookupTask: Task<Void, Never>?
+    private var creditsCountdownTask: Task<Void, Never>?
+    private var secondsCancellable: AnyCancellable?
+
+    /// Set when the viewer backs out of the countdown, so it stays hidden
+    /// until playback moves back before the credits.
+    private var isCreditsCountdownDismissed = false
+
+    /// Seconds left before the next item starts, while the end-credits
+    /// countdown is running. `nil` when no countdown is showing.
+    @Published
+    private(set) var creditsCountdown: Int?
+
+    /// Plays the next item in the queue right away, from the credits countdown.
+    func playNextFromCredits() {
+        guard let nextItem = queue?.nextItem else {
+            cancelCreditsCountdown()
+            return
+        }
+
+        cancelCreditsCountdown()
+        // Keep the countdown from restarting while the next item loads.
+        isCreditsCountdownDismissed = true
+
+        // Report the current item as finished so the server marks it played
+        // instead of saving a resume position in the credits.
+        if let runtime = item.runtime {
+            seconds = runtime
+        }
+
+        playNewItem(provider: nextItem)
+    }
+
+    /// Hides the countdown and lets the credits keep playing.
+    func dismissCreditsCountdown() {
+        cancelCreditsCountdown()
+        isCreditsCountdownDismissed = true
+    }
+
+    private func cancelCreditsCountdown() {
+        creditsCountdownTask?.cancel()
+        creditsCountdownTask = nil
+        creditsCountdown = nil
+    }
+
+    private func observeSecondsForCredits() {
+        secondsCancellable = secondsBox.$value
+            .sink { [weak self] seconds in
+                self?.secondsDidChange(seconds)
+            }
+    }
+
+    /// Looks up where the credits start for a newly playing item.
+    private func resetCredits(for playbackItem: MediaPlayerItem) {
+        creditsLookupTask?.cancel()
+        cancelCreditsCountdown()
+        creditsStart = nil
+        isCreditsCountdownDismissed = false
+
+        guard Self.supportsCreditsCountdown,
+              Defaults[.VideoPlayer.skipCredits],
+              !isPlayingIntro,
+              let itemID = playbackItem.baseItem.id,
+              let userSession = Container.shared.currentUserSession()
+        else { return }
+
+        creditsLookupTask = Task { [weak self] in
+            let request = Paths.getItemSegments(itemID: itemID, includeSegmentTypes: [.outro])
+            guard let response = try? await userSession.client.send(request) else { return }
+            guard !Task.isCancelled, let self else { return }
+
+            let start = response.value.items?
+                .compactMap(\.startTicks)
+                .min()
+                .map { Duration.ticks($0) }
+
+            self.creditsStart = start
+
+            self.logger.info(
+                "Credits lookup",
+                metadata: [
+                    "itemID": .stringConvertible(itemID),
+                    "creditsStart": .stringConvertible(start.map { "\($0)" } ?? "none"),
+                ]
+            )
+        }
+    }
+
+    private func secondsDidChange(_ seconds: Duration) {
+        guard let creditsStart, !isPlayingIntro else { return }
+
+        guard seconds >= creditsStart else {
+            // Moved back before the credits: re-arm the countdown.
+            if creditsCountdown != nil {
+                cancelCreditsCountdown()
+            }
+            isCreditsCountdownDismissed = false
+            return
+        }
+
+        guard creditsCountdown == nil,
+              !isCreditsCountdownDismissed,
+              playbackRequestStatus == .playing,
+              queue?.nextItem != nil,
+              (try? authenticatedUser.data.configuration?.enableNextEpisodeAutoPlay) == true
+        else { return }
+
+        startCreditsCountdown()
+    }
+
+    private func startCreditsCountdown() {
+        creditsCountdown = Self.creditsCountdownLength
+
+        creditsCountdownTask = Task { [weak self] in
+            while let self, let remaining = self.creditsCountdown, remaining > 0 {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled else { return }
+
+                // Pausing holds the countdown.
+                if self.playbackRequestStatus == .paused {
+                    continue
+                }
+
+                self.creditsCountdown = remaining - 1
+            }
+
+            guard !Task.isCancelled else { return }
+            self?.playNextFromCredits()
+        }
+    }
+
     /// Returns a provider for the first intro the server has for `item`, or `nil`
     /// if intros are disabled, the server has none, or the request fails.
     private static func introProvider(for item: BaseItemDto) async -> MediaPlayerItemProvider? {
@@ -457,6 +609,7 @@ final class MediaPlayerManager: ViewModel {
     //       - check that observers would respond correctly to stopping
     @Function(\Action.Cases.stop)
     private func _stop() async throws {
+        cancelCreditsCountdown()
         await self.cancel()
 
         proxy?.stop()

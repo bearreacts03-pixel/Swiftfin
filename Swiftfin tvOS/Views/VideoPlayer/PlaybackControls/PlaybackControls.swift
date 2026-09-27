@@ -43,8 +43,22 @@ extension VideoPlayer {
                 if let feature = manager.pendingFeatureProvider?.item {
                     // While an intro plays, show what's coming up instead of
                     // the intro's own title, timeline, and controls.
-                    IntroOverlay(feature: feature)
-                        .transition(.opacity)
+                    UpNextOverlay(
+                        item: feature,
+                        actionTitle: L10n.skipIntro,
+                        actionSystemImage: "forward.end.fill"
+                    )
+                    .transition(.opacity)
+                } else if let countdown = manager.creditsCountdown,
+                          let nextItem = manager.queue?.nextItem?.item
+                {
+                    // During the end credits, count down to the next item.
+                    UpNextOverlay(
+                        item: nextItem,
+                        actionTitle: L10n.startingIn(countdown),
+                        actionSystemImage: "play.fill"
+                    )
+                    .transition(.opacity)
                 } else {
                     Toolbar()
                         .isVisible(
@@ -70,6 +84,7 @@ extension VideoPlayer {
             .animation(.easeInOut(duration: 0.25), value: containerState.isPresentingOverlay)
             .animation(.linear(duration: 0.1), value: containerState.isScrubbing)
             .animation(.easeInOut(duration: 0.25), value: manager.isPlayingIntro)
+            .animation(.easeInOut(duration: 0.25), value: manager.creditsCountdown == nil)
             .alert(L10n.closePlayer, isPresented: $containerState.isPresentingCloseConfirmation) {
                 Button(L10n.cancel, role: .cancel) {}
 
@@ -105,11 +120,13 @@ extension VideoPlayer {
 
 extension VideoPlayer.PlaybackControls {
 
-    /// Shown in place of the playback controls while an intro plays.
-    /// Pressing select skips the intro.
-    struct IntroOverlay: View {
+    /// Shown in place of the playback controls while an intro plays or the
+    /// end-credits countdown runs. Pressing select performs the action.
+    struct UpNextOverlay: View {
 
-        let feature: BaseItemDto
+        let item: BaseItemDto
+        let actionTitle: String
+        let actionSystemImage: String
 
         var body: some View {
             HStack(alignment: .bottom) {
@@ -119,13 +136,13 @@ extension VideoPlayer.PlaybackControls {
                         .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
 
-                    Text(feature.seriesName ?? feature.displayTitle)
+                    Text(item.seriesName ?? item.displayTitle)
                         .font(.title2)
                         .fontWeight(.bold)
                         .lineLimit(1)
 
-                    if feature.type == .episode, let seasonEpisodeLabel = feature.seasonEpisodeLabel {
-                        Text("\(seasonEpisodeLabel) • \(feature.displayTitle)")
+                    if item.type == .episode, let seasonEpisodeLabel = item.seasonEpisodeLabel {
+                        Text("\(seasonEpisodeLabel) • \(item.displayTitle)")
                             .font(.callout)
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
@@ -135,7 +152,7 @@ extension VideoPlayer.PlaybackControls {
 
                 Spacer()
 
-                Label(L10n.skipIntro, systemImage: "forward.end.fill")
+                Label(actionTitle, systemImage: actionSystemImage)
                     .font(.headline)
                     .padding(.horizontal, 30)
                     .padding(.vertical, 16)

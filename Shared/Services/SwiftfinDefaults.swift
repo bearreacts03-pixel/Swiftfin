@@ -290,6 +290,10 @@ extension Defaults.Keys {
             UserKey("playIntros", default: true)
         }
 
+        static var skipCredits: Key<Bool> {
+            UserKey("skipCredits", default: true)
+        }
+
         static var resumeOffset: Key<Int> {
             UserKey("resumeOffset", default: 0)
         }

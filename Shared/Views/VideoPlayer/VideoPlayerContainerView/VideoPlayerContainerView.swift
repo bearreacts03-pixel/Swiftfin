@@ -880,6 +880,12 @@ extension VideoPlayer {
                 return
             }
 
+            // During the credits countdown, select plays the next item now.
+            if manager.creditsCountdown != nil {
+                manager.playNextFromCredits()
+                return
+            }
+
             if !containerState.isPresentingOverlay {
                 containerState.isPresentingOverlay = true
                 containerState.timer.poke()
@@ -904,6 +910,12 @@ extension VideoPlayer {
 
         @objc
         private func handleMenuEnded() {
+            // During the credits countdown, back dismisses it and keeps watching.
+            if manager.creditsCountdown != nil {
+                manager.dismissCreditsCountdown()
+                return
+            }
+
             if containerState.isScrubbing {
                 containerState.cancelScrub()
                 containerState.timer.poke()
