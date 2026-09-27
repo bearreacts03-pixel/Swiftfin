@@ -1584,6 +1584,8 @@ internal enum L10n {
   internal static let simple = L10n.tr("Localizable", "simple", fallback: "Simple")
   /// Size
   internal static let size = L10n.tr("Localizable", "size", fallback: "Size")
+  /// Skip intro
+  internal static let skipIntro = L10n.tr("Localizable", "skipIntro", fallback: "Skip intro")
   /// Slider
   internal static let slider = L10n.tr("Localizable", "slider", fallback: "Slider")
   /// Slow scrub

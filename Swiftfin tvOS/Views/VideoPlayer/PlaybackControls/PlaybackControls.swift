@@ -7,6 +7,7 @@
 //
 
 import Defaults
+import JellyfinAPI
 import SwiftUI
 
 extension VideoPlayer {
@@ -39,21 +40,28 @@ extension VideoPlayer {
         var body: some View {
             VStack(spacing: 30) {
 
-                Toolbar()
-                    .isVisible(
-                        containerState.isPresentingOverlay &&
-                            !containerState.isScrubbing &&
-                            !containerState.isPresentingSupplement
-                    )
-                    .disabled(containerState.isPresentingSupplement)
+                if let feature = manager.pendingFeatureProvider?.item {
+                    // While an intro plays, show what's coming up instead of
+                    // the intro's own title, timeline, and controls.
+                    IntroOverlay(feature: feature)
+                        .transition(.opacity)
+                } else {
+                    Toolbar()
+                        .isVisible(
+                            containerState.isPresentingOverlay &&
+                                !containerState.isScrubbing &&
+                                !containerState.isPresentingSupplement
+                        )
+                        .disabled(containerState.isPresentingSupplement)
 
-                PlaybackProgress()
-                    .focused($isPlaybackProgressFocused)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .isVisible(
-                        (containerState.isPresentingOverlay || containerState.isScrubbing) &&
-                            !containerState.isPresentingSupplement
-                    )
+                    PlaybackProgress()
+                        .focused($isPlaybackProgressFocused)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .isVisible(
+                            (containerState.isPresentingOverlay || containerState.isScrubbing) &&
+                                !containerState.isPresentingSupplement
+                        )
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             .edgePadding(.horizontal)
@@ -61,6 +69,7 @@ extension VideoPlayer {
             .animation(.easeInOut(duration: 0.25), value: containerState.isPresentingSupplement)
             .animation(.easeInOut(duration: 0.25), value: containerState.isPresentingOverlay)
             .animation(.linear(duration: 0.1), value: containerState.isScrubbing)
+            .animation(.easeInOut(duration: 0.25), value: manager.isPlayingIntro)
             .alert(L10n.closePlayer, isPresented: $containerState.isPresentingCloseConfirmation) {
                 Button(L10n.cancel, role: .cancel) {}
 
@@ -90,6 +99,49 @@ extension VideoPlayer {
                     }
                 }
             }
+        }
+    }
+}
+
+extension VideoPlayer.PlaybackControls {
+
+    /// Shown in place of the playback controls while an intro plays.
+    /// Pressing select skips the intro.
+    struct IntroOverlay: View {
+
+        let feature: BaseItemDto
+
+        var body: some View {
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.nextUp)
+                        .font(.callout)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
+
+                    Text(feature.seriesName ?? feature.displayTitle)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+
+                    if feature.type == .episode, let seasonEpisodeLabel = feature.seasonEpisodeLabel {
+                        Text("\(seasonEpisodeLabel) • \(feature.displayTitle)")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+                .shadow(color: .black.opacity(0.6), radius: 8)
+
+                Spacer()
+
+                Label(L10n.skipIntro, systemImage: "forward.end.fill")
+                    .font(.headline)
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 16)
+                    .background(.ultraThinMaterial, in: Capsule())
+            }
+            .padding(.bottom, 40)
         }
     }
 }

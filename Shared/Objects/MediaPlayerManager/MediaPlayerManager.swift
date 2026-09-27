@@ -141,6 +141,12 @@ final class MediaPlayerManager: ViewModel {
 
     // TODO: replace with graph dependency package
     private func setSupplements() {
+        // Intros have no chapters, info, or queue worth showing.
+        guard !isPlayingIntro else {
+            self.supplements = []
+            return
+        }
+
         var newSupplements = Defaults[.VideoPlayer.supplements].compactMap { kind -> (any MediaPlayerSupplement)? in
             switch kind {
             case .info:
@@ -198,6 +204,12 @@ final class MediaPlayerManager: ViewModel {
     /// Whether an intro is currently playing ahead of the requested item.
     var isPlayingIntro: Bool {
         pendingFeatureProvider != nil
+    }
+
+    /// Skips the current intro and starts the requested item.
+    func skipIntro() {
+        guard let featureProvider = pendingFeatureProvider else { return }
+        playNewItem(provider: featureProvider)
     }
 
     // MARK: init

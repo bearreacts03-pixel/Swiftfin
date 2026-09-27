@@ -874,6 +874,12 @@ extension VideoPlayer {
         }
 
         private func handleSelectEnded(_ press: UIPress, event: UIPressesEvent?) {
+            // During an intro, select skips straight to the requested item.
+            if manager.isPlayingIntro {
+                manager.skipIntro()
+                return
+            }
+
             if !containerState.isPresentingOverlay {
                 containerState.isPresentingOverlay = true
                 containerState.timer.poke()
