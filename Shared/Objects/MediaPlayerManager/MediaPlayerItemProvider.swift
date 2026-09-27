@@ -53,6 +53,13 @@ struct MediaPlayerItemProvider {
         return copy
     }
 
+    /// The item as it will be played, with any modifications applied.
+    var resolvedItem: BaseItemDto {
+        var copy = item
+        modifyItem?(&copy)
+        return copy
+    }
+
     func callAsFunction() async throws -> MediaPlayerItem {
         try await resolver(item, modifyItem)
     }

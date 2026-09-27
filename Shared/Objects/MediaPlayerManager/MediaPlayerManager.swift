@@ -190,6 +190,16 @@ final class MediaPlayerManager: ViewModel {
 
     private var initialMediaPlayerItemProvider: MediaPlayerItemProvider?
 
+    /// The item waiting to play once the current intro finishes.
+    /// Non-nil only while an intro is playing.
+    @Published
+    private(set) var pendingFeatureProvider: MediaPlayerItemProvider?
+
+    /// Whether an intro is currently playing ahead of the requested item.
+    var isPlayingIntro: Bool {
+        pendingFeatureProvider != nil
+    }
+
     // MARK: init
 
 //    static let empty: MediaPlayerManager = .init()
@@ -228,13 +238,13 @@ final class MediaPlayerManager: ViewModel {
 
     @Function(\Action.Cases.ended)
     private func _ended() async throws {
-        // An intro always continues into its feature item, regardless
-        // of the autoplay setting or whether the intro reports a runtime.
-        if queue?.id == IntroMediaPlayerQueue.identifier, let featureItem = queue?.nextItem {
+        // An intro always continues into its feature, regardless of
+        // the autoplay setting or whether the intro reports a runtime.
+        if let featureProvider = pendingFeatureProvider {
             if let runtime = item.runtime, (runtime - seconds) > .seconds(1) {
                 return
             }
-            await self.playNewItem(provider: featureItem)
+            await self.playNewItem(provider: featureProvider)
             return
         }
 
@@ -292,6 +302,10 @@ final class MediaPlayerManager: ViewModel {
 
     @Function(\Action.Cases.playNewItem)
     private func _playNewItem(_ provider: MediaPlayerItemProvider) async throws {
+        // Intros only play when a playback session starts, so anything
+        // played within the session (autoplay, next/previous, the episode
+        // picker, or the feature after its intro) starts directly.
+        pendingFeatureProvider = nil
         item = provider.item
         setSupplements()
         proxy?.stop()
@@ -377,7 +391,46 @@ final class MediaPlayerManager: ViewModel {
             return
         }
         self.initialMediaPlayerItemProvider = nil
-        playbackItem = try await initialMediaPlayerItemProvider()
+        playbackItem = try await startingPlaybackItem(for: initialMediaPlayerItemProvider)
+    }
+
+    /// Builds the first item of a playback session: an intro when one should play, otherwise the item itself.
+    ///
+    /// Intros are skipped when disabled in settings, when resuming partway through,
+    /// or when the server has none or the intro fails to load.
+    private func startingPlaybackItem(for provider: MediaPlayerItemProvider) async throws -> MediaPlayerItem {
+        let isResuming = (provider.resolvedItem.startSeconds ?? .zero) > .zero
+
+        if !isResuming,
+           let introProvider = await Self.introProvider(for: provider.item),
+           let introItem = try? await introProvider()
+        {
+            pendingFeatureProvider = provider
+            return introItem
+        }
+
+        pendingFeatureProvider = nil
+        return try await provider()
+    }
+
+    /// Returns a provider for the first intro the server has for `item`, or `nil`
+    /// if intros are disabled, the server has none, or the request fails.
+    private static func introProvider(for item: BaseItemDto) async -> MediaPlayerItemProvider? {
+        guard Defaults[.VideoPlayer.playIntros] else { return nil }
+        guard let itemID = item.id, let userSession = Container.shared.currentUserSession() else { return nil }
+
+        do {
+            let request = Paths.getIntros(itemID: itemID, userID: userSession.user.id)
+            let response = try await userSession.client.send(request)
+
+            guard let introItem = response.value.items?.first else { return nil }
+
+            return MediaPlayerItemProvider(item: introItem) { item, modifyItem in
+                try await MediaPlayerItem.build(for: item, modifyItem: modifyItem)
+            }
+        } catch {
+            return nil
+        }
     }
 
     // TODO: remove playback item?

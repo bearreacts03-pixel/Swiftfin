@@ -174,7 +174,7 @@ extension EpisodeMediaPlayerQueue {
         }
 
         private func select(episode: BaseItemDto) {
-            let featureProvider = MediaPlayerItemProvider(item: episode) { [manager] item, modifyItem in
+            let provider = MediaPlayerItemProvider(item: episode) { [manager] item, modifyItem in
                 try await MediaPlayerItem.build(
                     for: item,
                     requestedBitrate: manager.playbackBitrate,
@@ -182,21 +182,7 @@ extension EpisodeMediaPlayerQueue {
                 )
             }
 
-            Task {
-                if let introProvider = await IntroMediaPlayerQueue.introProvider(for: episode) {
-                    let innerQueue = EpisodeMediaPlayerQueue(episode: episode)
-                    let introQueue = IntroMediaPlayerQueue(
-                        featureProvider: featureProvider,
-                        innerQueue: innerQueue
-                    )
-                    let wrapped = AnyMediaPlayerQueue(introQueue)
-                    manager.queue = wrapped
-                    wrapped.manager = manager
-                    await manager.playNewItem(provider: introProvider)
-                } else {
-                    await manager.playNewItem(provider: featureProvider)
-                }
-            }
+            manager.playNewItem(provider: provider)
         }
 
         private func selectInitialSeason() {
