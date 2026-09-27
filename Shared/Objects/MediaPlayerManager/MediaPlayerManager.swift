@@ -405,6 +405,10 @@ final class MediaPlayerManager: ViewModel {
            let introProvider = await Self.introProvider(for: provider.item),
            let introItem = try? await introProvider()
         {
+            // Intros are not reported to the server, so they never
+            // gain a play count, a resume position, or "played" status.
+            introItem.observers.removeAll { $0 is MediaProgressObserver }
+
             pendingFeatureProvider = provider
             return introItem
         }
@@ -426,7 +430,11 @@ final class MediaPlayerManager: ViewModel {
             guard let introItem = response.value.items?.first else { return nil }
 
             return MediaPlayerItemProvider(item: introItem) { item, modifyItem in
-                try await MediaPlayerItem.build(for: item, modifyItem: modifyItem)
+                try await MediaPlayerItem.build(for: item) { item in
+                    // Always start an intro from the beginning.
+                    item.userData?.playbackPositionTicks = .zero
+                    modifyItem?(&item)
+                }
             }
         } catch {
             return nil
