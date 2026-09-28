@@ -13,8 +13,6 @@ struct CustomizeSettingsView: View {
 
     @Default(.Customization.Search.enabledDrawerFilters)
     private var searchEnabledDrawerFilters
-    @Default(.Customization.playThemeSongs)
-    private var playThemeSongs
 
     #if os(tvOS)
     @Default(.Customization.tabBarPlacement)
@@ -42,11 +40,7 @@ struct CustomizeSettingsView: View {
                 Text(L10n.filters)
             }
 
-            Section {
-                Toggle(L10n.playThemeSongs, isOn: $playThemeSongs)
-            } footer: {
-                Text(L10n.playThemeSongsDescription)
-            }
+            BearfinSettingsSection() // Bearfin
 
             ChevronButton(L10n.items) {
                 router.route(to: .itemSettings)

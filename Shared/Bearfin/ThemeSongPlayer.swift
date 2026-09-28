@@ -12,6 +12,7 @@ import FactoryKit
 import Foundation
 import JellyfinAPI
 import Logging
+import SwiftUI
 
 /// Plays an item's theme song while its page is open, such as the songs
 /// the Themerr plugin downloads for movies and shows.
@@ -46,7 +47,7 @@ final class ThemeSongPlayer {
         stopTask?.cancel()
         stopTask = nil
 
-        guard Defaults[.Customization.playThemeSongs],
+        guard Defaults[.Bearfin.playThemeSongs],
               let itemID = item.id,
               let userSession = Container.shared.currentUserSession()
         else {
@@ -189,6 +190,21 @@ final class ThemeSongPlayer {
             }
 
             completion?()
+        }
+    }
+}
+
+// MARK: - Item pages
+
+extension View {
+
+    /// Plays the item's theme song while this page is open.
+    func playsThemeSong(for item: BaseItemDto) -> some View {
+        onAppear {
+            ThemeSongPlayer.shared.play(for: item)
+        }
+        .onDisappear {
+            ThemeSongPlayer.shared.stopSoon()
         }
     }
 }

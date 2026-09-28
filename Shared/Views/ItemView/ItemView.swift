@@ -18,7 +18,6 @@ struct ItemView: View {
         static let header = "itemView-header"
         static let menu = "itemView-menu"
         static let play = "itemView-play"
-        static let playFromBeginning = "itemView-playFromBeginning"
     }
 
     @Default(.Customization.itemViewType)
@@ -144,12 +143,7 @@ struct ItemView: View {
         .onFirstAppear {
             viewModel.refresh()
         }
-        .onAppear {
-            ThemeSongPlayer.shared.play(for: provider.item)
-        }
-        .onDisappear {
-            ThemeSongPlayer.shared.stopSoon()
-        }
+        .playsThemeSong(for: provider.item) // Bearfin
         .environmentObject(focusCoordinator)
         .confirmationDialog(
             L10n.deleteItemConfirmationMessage,

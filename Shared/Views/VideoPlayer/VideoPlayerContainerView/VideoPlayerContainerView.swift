@@ -874,17 +874,9 @@ extension VideoPlayer {
         }
 
         private func handleSelectEnded(_ press: UIPress, event: UIPressesEvent?) {
-            // During an intro, select skips straight to the requested item.
-            if manager.isPlayingIntro {
-                manager.skipIntro()
+            if manager.bearfinHandleSelect() {
                 return
-            }
-
-            // During the credits countdown, select plays the next item now.
-            if manager.creditsCountdown != nil {
-                manager.playNextFromCredits()
-                return
-            }
+            } // Bearfin: skip intro / play next
 
             if !containerState.isPresentingOverlay {
                 containerState.isPresentingOverlay = true
@@ -910,11 +902,9 @@ extension VideoPlayer {
 
         @objc
         private func handleMenuEnded() {
-            // During the credits countdown, back dismisses it and keeps watching.
-            if manager.creditsCountdown != nil {
-                manager.dismissCreditsCountdown()
+            if manager.bearfinHandleMenu() {
                 return
-            }
+            } // Bearfin: dismiss credits countdown
 
             if containerState.isScrubbing {
                 containerState.cancelScrub()

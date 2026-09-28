@@ -23,10 +23,6 @@ struct VideoPlayerSettingsView: View {
 
     @Default(.VideoPlayer.videoPlayerType)
     private var videoPlayerType
-    @Default(.VideoPlayer.playIntros)
-    private var playIntros
-    @Default(.VideoPlayer.skipCredits)
-    private var skipCredits
 
     // MARK: - Button Defaults
 
@@ -147,12 +143,6 @@ struct VideoPlayerSettingsView: View {
             ChevronButton(L10n.playbackQuality) {
                 router.route(to: .playbackQualitySettings)
             }
-
-            Toggle(L10n.playIntros, isOn: $playIntros)
-
-            if UIDevice.isTV {
-                Toggle(L10n.skipCredits, isOn: $skipCredits)
-            }
         } learnMore: {
             LabeledContent(
                 L10n.vlc,
@@ -161,14 +151,6 @@ struct VideoPlayerSettingsView: View {
             LabeledContent(
                 L10n.native,
                 value: L10n.playerNativeDescription
-            )
-            LabeledContent(
-                L10n.playIntros,
-                value: L10n.playIntrosDescription
-            )
-            LabeledContent(
-                L10n.skipCredits,
-                value: L10n.skipCreditsDescription
             )
         }
     }

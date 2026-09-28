@@ -121,25 +121,23 @@ class NowPlayableObserver: ViewModel, MediaPlayerObserver {
         itemImageCancellable = nil
         guard let newItem else { return }
 
-        // While an intro plays, show the requested item instead of the intro.
-        if let featureItem = manager?.pendingFeatureProvider?.item {
-            setNowPlayingMetadata(featureItem.nowPlayableStaticMetadata())
-        } else {
-            setNowPlayingMetadata(newItem.baseItem.nowPlayableStaticMetadata())
+        // Bearfin: while an intro plays, show the requested item instead.
+        let displayedItem = manager?.pendingFeatureProvider?.item ?? newItem.baseItem
+        setNowPlayingMetadata(displayedItem.nowPlayableStaticMetadata())
 
-            itemImageCancellable = Task {
-                let currentBaseItem = newItem.baseItem
-                guard let image = await newItem.thumbnailProvider?() else { return }
-                guard manager?.item.id == currentBaseItem.id else { return }
+        itemImageCancellable = Task {
+            let currentBaseItem = newItem.baseItem
+            guard let image = await newItem.thumbnailProvider?() else { return }
+            guard manager?.item.id == currentBaseItem.id else { return }
+            guard manager?.isPlayingIntro != true else { return } // Bearfin
 
-                await MainActor.run {
-                    setNowPlayingMetadata(
-                        currentBaseItem.nowPlayableStaticMetadata(image)
-                    )
-                }
+            await MainActor.run {
+                setNowPlayingMetadata(
+                    currentBaseItem.nowPlayableStaticMetadata(image)
+                )
             }
-            .asAnyCancellable()
         }
+        .asAnyCancellable()
 
         handleNowPlayablePlaybackChange(
             playing: true,

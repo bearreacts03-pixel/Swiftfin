@@ -22,11 +22,6 @@ extension ItemView {
 
         let alignment: HorizontalAlignment
 
-        /// Whether the item has a saved spot to resume from.
-        private var hasResumePosition: Bool {
-            (provider.mediaPlayerItemProvider?.item.userData?.playbackPositionTicks ?? 0) > 0
-        }
-
         init(
             provider: ItemContentGroupProvider,
             alignment: HorizontalAlignment = .center
@@ -46,11 +41,7 @@ extension ItemView {
                         PlayButton(provider: provider)
                             .coordinatedFocus(ItemView.Component.play, selection: $focusedButton)
 
-                        if hasResumePosition {
-                            PlayButton(provider: provider, fromBeginning: true)
-                                .coordinatedFocus(ItemView.Component.playFromBeginning, selection: $focusedButton)
-                                .fixedSize(horizontal: true, vertical: false)
-                        }
+                        PlayFromBeginningButton(provider: provider, focusedButton: $focusedButton) // Bearfin
                     }
                     .frame(height: UIDevice.isTV ? 75 : 44)
                 }

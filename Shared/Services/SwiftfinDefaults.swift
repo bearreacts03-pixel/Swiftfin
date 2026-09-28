@@ -111,10 +111,6 @@ extension Defaults.Keys {
 
     enum Customization {
 
-        static var playThemeSongs: Key<Bool> {
-            UserKey("playThemeSongs", default: true)
-        }
-
         static var itemViewType: Key<ItemViewType> {
             UserKey("mediaItemViewType", default: .enhanced)
         }
@@ -288,14 +284,6 @@ extension Defaults.Keys {
                 "menuActionButtons",
                 default: VideoPlayerActionButton.defaultMenuActionButtons
             )
-        }
-
-        static var playIntros: Key<Bool> {
-            UserKey("playIntros", default: true)
-        }
-
-        static var skipCredits: Key<Bool> {
-            UserKey("skipCredits", default: true)
         }
 
         static var resumeOffset: Key<Int> {

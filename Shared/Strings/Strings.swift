@@ -1246,10 +1246,6 @@ internal enum L10n {
   internal static let playerVlcDescription = L10n.tr("Localizable", "playerVlcDescription", fallback: "Uses SwiftVLC and libVLC 4 to provide compatibility with nearly any file type.")
   /// Play From beginning
   internal static let playFromBeginning = L10n.tr("Localizable", "playFromBeginning", fallback: "Play From beginning")
-  /// Play intros
-  internal static let playIntros = L10n.tr("Localizable", "playIntros", fallback: "Play intros")
-  /// Plays intro videos provided by your server, such as prerolls from a server plugin, before movies and when you start an episode.
-  internal static let playIntrosDescription = L10n.tr("Localizable", "playIntrosDescription", fallback: "Plays intro videos provided by your server, such as prerolls from a server plugin, before movies and when you start an episode.")
   /// Playlist
   internal static let playlist = L10n.tr("Localizable", "playlist", fallback: "Playlist")
   /// Playlists
@@ -1262,10 +1258,6 @@ internal enum L10n {
   internal static let playNextItem = L10n.tr("Localizable", "playNextItem", fallback: "Play next item")
   /// Play previous item
   internal static let playPreviousItem = L10n.tr("Localizable", "playPreviousItem", fallback: "Play previous item")
-  /// Play theme songs
-  internal static let playThemeSongs = L10n.tr("Localizable", "playThemeSongs", fallback: "Play theme songs")
-  /// Plays a movie's or show's theme song on its page, such as the songs added by the Themerr plugin.
-  internal static let playThemeSongsDescription = L10n.tr("Localizable", "playThemeSongsDescription", fallback: "Plays a movie\'s or show\'s theme song on its page, such as the songs added by the Themerr plugin.")
   /// Portrait
   internal static let portrait = L10n.tr("Localizable", "portrait", fallback: "Portrait")
   /// Posters
@@ -1588,12 +1580,6 @@ internal enum L10n {
   internal static let simple = L10n.tr("Localizable", "simple", fallback: "Simple")
   /// Size
   internal static let size = L10n.tr("Localizable", "size", fallback: "Size")
-  /// Skip credits
-  internal static let skipCredits = L10n.tr("Localizable", "skipCredits", fallback: "Skip credits")
-  /// When the end credits start, counts down and plays the next episode. Requires a server plugin that detects credits, such as Intro Skipper.
-  internal static let skipCreditsDescription = L10n.tr("Localizable", "skipCreditsDescription", fallback: "When the end credits start, counts down and plays the next episode. Requires a server plugin that detects credits, such as Intro Skipper.")
-  /// Skip intro
-  internal static let skipIntro = L10n.tr("Localizable", "skipIntro", fallback: "Skip intro")
   /// Slider
   internal static let slider = L10n.tr("Localizable", "slider", fallback: "Slider")
   /// Slow scrub
@@ -1632,10 +1618,6 @@ internal enum L10n {
   internal static let start = L10n.tr("Localizable", "start", fallback: "Start")
   /// Start date
   internal static let startDate = L10n.tr("Localizable", "startDate", fallback: "Start date")
-  /// Starting in %@
-  internal static func startingIn(_ p1: Any) -> String {
-    return L10n.tr("Localizable", "startingIn", String(describing: p1), fallback: "Starting in %@")
-  }
   /// Start time
   internal static let startTime = L10n.tr("Localizable", "startTime", fallback: "Start time")
   /// Status

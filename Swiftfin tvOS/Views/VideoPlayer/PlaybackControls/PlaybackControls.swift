@@ -7,7 +7,6 @@
 //
 
 import Defaults
-import JellyfinAPI
 import SwiftUI
 
 extension VideoPlayer {
@@ -40,51 +39,31 @@ extension VideoPlayer {
         var body: some View {
             VStack(spacing: 30) {
 
-                if let feature = manager.pendingFeatureProvider?.item {
-                    // While an intro plays, show what's coming up instead of
-                    // the intro's own title, timeline, and controls.
-                    UpNextOverlay(
-                        item: feature,
-                        actionTitle: L10n.skipIntro,
-                        actionSystemImage: "forward.end.fill"
+                Toolbar()
+                    .isVisible(
+                        containerState.isPresentingOverlay &&
+                            !containerState.isScrubbing &&
+                            !containerState.isPresentingSupplement
                     )
-                    .transition(.opacity)
-                } else if let countdown = manager.creditsCountdown,
-                          let nextItem = manager.queue?.nextItem?.item
-                {
-                    // During the end credits, count down to the next item.
-                    UpNextOverlay(
-                        item: nextItem,
-                        actionTitle: L10n.startingIn(countdown),
-                        actionSystemImage: "play.fill"
-                    )
-                    .transition(.opacity)
-                } else {
-                    Toolbar()
-                        .isVisible(
-                            containerState.isPresentingOverlay &&
-                                !containerState.isScrubbing &&
-                                !containerState.isPresentingSupplement
-                        )
-                        .disabled(containerState.isPresentingSupplement)
+                    .disabled(containerState.isPresentingSupplement)
 
-                    PlaybackProgress()
-                        .focused($isPlaybackProgressFocused)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .isVisible(
-                            (containerState.isPresentingOverlay || containerState.isScrubbing) &&
-                                !containerState.isPresentingSupplement
-                        )
-                }
+                PlaybackProgress()
+                    .focused($isPlaybackProgressFocused)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .isVisible(
+                        (containerState.isPresentingOverlay || containerState.isScrubbing) &&
+                            !containerState.isPresentingSupplement
+                    )
             }
+            .opacity(manager.isShowingUpNext ? 0 : 1) // Bearfin
+            .disabled(manager.isShowingUpNext) // Bearfin
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
             .edgePadding(.horizontal)
+            .overlay(alignment: .bottom) { UpNextOverlay() } // Bearfin
             .focusSection()
             .animation(.easeInOut(duration: 0.25), value: containerState.isPresentingSupplement)
             .animation(.easeInOut(duration: 0.25), value: containerState.isPresentingOverlay)
             .animation(.linear(duration: 0.1), value: containerState.isScrubbing)
-            .animation(.easeInOut(duration: 0.25), value: manager.isPlayingIntro)
-            .animation(.easeInOut(duration: 0.25), value: manager.creditsCountdown == nil)
             .alert(L10n.closePlayer, isPresented: $containerState.isPresentingCloseConfirmation) {
                 Button(L10n.cancel, role: .cancel) {}
 
@@ -114,51 +93,6 @@ extension VideoPlayer {
                     }
                 }
             }
-        }
-    }
-}
-
-extension VideoPlayer.PlaybackControls {
-
-    /// Shown in place of the playback controls while an intro plays or the
-    /// end-credits countdown runs. Pressing select performs the action.
-    struct UpNextOverlay: View {
-
-        let item: BaseItemDto
-        let actionTitle: String
-        let actionSystemImage: String
-
-        var body: some View {
-            HStack(alignment: .bottom) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(L10n.nextUp)
-                        .font(.callout)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color.bearfinYellow)
-
-                    Text(item.seriesName ?? item.displayTitle)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .lineLimit(1)
-
-                    if item.type == .episode, let seasonEpisodeLabel = item.seasonEpisodeLabel {
-                        Text("\(seasonEpisodeLabel) • \(item.displayTitle)")
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                .shadow(color: .black.opacity(0.6), radius: 8)
-
-                Spacer()
-
-                Label(actionTitle, systemImage: actionSystemImage)
-                    .font(.headline)
-                    .padding(.horizontal, 30)
-                    .padding(.vertical, 16)
-                    .background(.ultraThinMaterial, in: Capsule())
-            }
-            .padding(.bottom, 40)
         }
     }
 }
