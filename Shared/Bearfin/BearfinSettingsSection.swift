@@ -23,9 +23,7 @@ struct BearfinSettingsSection: View {
         Section {
             Toggle(BearfinStrings.playIntros, isOn: $playIntros)
 
-            if UIDevice.isTV {
-                Toggle(BearfinStrings.skipCredits, isOn: $skipCredits)
-            }
+            Toggle(BearfinStrings.skipCredits, isOn: $skipCredits)
 
             Toggle(BearfinStrings.playThemeSongs, isOn: $playThemeSongs)
         } header: {

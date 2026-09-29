@@ -35,6 +35,15 @@ final class ThemeSongPlayer {
     private var statusObservation: NSKeyValueObservation?
     private var currentSongID: String?
 
+    /// True for as long as any video — an intro or the feature itself — is
+    /// playing. While suspended, `play(for:)` does nothing, even if a page
+    /// underneath the player calls it again. This closes a real bug: on
+    /// iOS/iPadOS, the item page stays alive behind the full-screen player,
+    /// and can re-fire its `onAppear` when the intro hands off to the
+    /// feature — which called this a second time mid-playback and knocked
+    /// out the movie's audio session.
+    private var isSuspendedForVideoPlayback = false
+
     private var loadTask: Task<Void, Never>?
     private var stopTask: Task<Void, Never>?
     private var fadeTask: Task<Void, Never>?
@@ -44,6 +53,8 @@ final class ThemeSongPlayer {
     /// Plays the theme song for `item`, or keeps the current song going
     /// if `item` shares it.
     func play(for item: BaseItemDto) {
+        guard !isSuspendedForVideoPlayback else { return }
+
         stopTask?.cancel()
         stopTask = nil
 
@@ -132,6 +143,19 @@ final class ThemeSongPlayer {
         player?.pause()
         player = nil
         currentSongID = nil
+    }
+
+    /// Stops any theme song and ignores further play requests until
+    /// `resumeAfterVideoPlayback()` is called. Covers an entire playback
+    /// session: the intro, the feature, and any autoplay in between.
+    func suspendForVideoPlayback() {
+        isSuspendedForVideoPlayback = true
+        stop()
+    }
+
+    /// Lets theme songs play again once the viewer has left the player.
+    func resumeAfterVideoPlayback() {
+        isSuspendedForVideoPlayback = false
     }
 
     private func start(url: URL, songID: String) {

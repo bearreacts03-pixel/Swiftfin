@@ -68,10 +68,11 @@ struct AppSettingsView: View {
             #if os(iOS)
             Section(L10n.customize) {
 
-                ChevronButton(L10n.appIcon) {
-                    // TODO: Create NavigationRoute.appIconSelector
-                    router.route(to: .appIconSelector(viewModel: viewModel))
-                }
+                // Bearfin: hidden until the alternate icons are redrawn in
+                // Bearfin's own style — Swiftfin's set is Jellyfin-branded.
+                // ChevronButton(L10n.appIcon) {
+                //     router.route(to: .appIconSelector(viewModel: viewModel))
+                // }
 
                 if !selectUserUseSplashscreen {
                     Picker(

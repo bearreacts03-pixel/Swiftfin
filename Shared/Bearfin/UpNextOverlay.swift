@@ -9,16 +9,27 @@
 import JellyfinAPI
 import SwiftUI
 
-/// What the Up Next card shows: the item coming up and the action
-/// the center click performs.
+/// What the Up Next card shows: the item coming up, and the action its
+/// button performs — the center click on tvOS, a tap everywhere else.
 struct UpNextContent {
     let item: BaseItemDto
     let actionTitle: String
     let actionSystemImage: String
+    let action: () -> Void
+
+    /// Only set during the end-credits countdown: lets the viewer dismiss
+    /// the card and keep watching the credits instead. tvOS handles this
+    /// with the remote's Back button; other platforms show an X.
+    let dismissAction: (() -> Void)?
 }
 
 /// The card shown in place of the playback controls while an intro plays
 /// or the end-credits countdown runs. Shows nothing otherwise.
+///
+/// On tvOS the card's button is a visual label only — the center click and
+/// Back button (handled in VideoPlayerContainerView) drive it. On iOS and
+/// iPadOS the button and the X are directly tappable, since there's no
+/// remote to press.
 struct UpNextOverlay: View {
 
     @EnvironmentObject
@@ -58,11 +69,34 @@ struct UpNextOverlay: View {
 
             Spacer()
 
-            Label(content.actionTitle, systemImage: content.actionSystemImage)
-                .font(.headline)
-                .padding(.horizontal, 30)
-                .padding(.vertical, 16)
-                .background(.ultraThinMaterial, in: Capsule())
+            HStack(spacing: 12) {
+                #if !os(tvOS)
+                if let dismissAction = content.dismissAction {
+                    Button(action: dismissAction) {
+                        Image(systemName: "xmark")
+                            .font(.headline)
+                            .padding(14)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
+                }
+                #endif
+
+                #if os(tvOS)
+                Label(content.actionTitle, systemImage: content.actionSystemImage)
+                    .font(.headline)
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 16)
+                    .background(.ultraThinMaterial, in: Capsule())
+                #else
+                Button(action: content.action) {
+                    Label(content.actionTitle, systemImage: content.actionSystemImage)
+                        .font(.headline)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 14)
+                        .background(.ultraThinMaterial, in: Capsule())
+                }
+                #endif
+            }
         }
         .padding(.bottom, 40)
     }

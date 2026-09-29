@@ -85,7 +85,14 @@ extension VideoPlayer {
                 }
 
                 PlaybackButtons()
-                    .isVisible(!isScrubbing && containerState.isPresentingPlaybackControls)
+                    .isVisible(!isScrubbing && containerState.isPresentingPlaybackControls && !manager.isShowingUpNext) // Bearfin
+
+                VStack {
+                    Spacer()
+                    UpNextOverlay() // Bearfin
+                        .padding(.horizontal, EdgeInsets.edgePadding)
+                        .padding(.bottom, safeAreaInsets.bottom)
+                }
             }
             .modifier(VideoPlayer.KeyCommandsModifier())
             .animation(.linear(duration: 0.1), value: isScrubbing)

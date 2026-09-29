@@ -42,7 +42,9 @@ extension MediaPlayerManager {
             return UpNextContent(
                 item: feature,
                 actionTitle: BearfinStrings.skipIntro,
-                actionSystemImage: "forward.end.fill"
+                actionSystemImage: "forward.end.fill",
+                action: { [weak self] in self?.skipIntro() },
+                dismissAction: nil
             )
         }
 
@@ -50,7 +52,9 @@ extension MediaPlayerManager {
             return UpNextContent(
                 item: nextItem,
                 actionTitle: BearfinStrings.startingIn(countdown),
-                actionSystemImage: "play.fill"
+                actionSystemImage: "play.fill",
+                action: { [weak self] in self?.playNextFromCredits() },
+                dismissAction: { [weak self] in self?.dismissCreditsCountdown() }
             )
         }
 
@@ -115,6 +119,12 @@ extension MediaPlayerManager {
     func bearfinWillPlayNewItem() {
         cancelCreditsCountdown()
 
+        // Covers every item played in this session — the intro, the
+        // feature, and any autoplay after it — so a page reappearing
+        // behind the player (which happens on iOS/iPadOS) can't sneak
+        // a theme song in over the video's audio.
+        ThemeSongPlayer.shared.suspendForVideoPlayback()
+
         // Intros only play when a playback session starts, so anything
         // played within the session (autoplay, next/previous, the episode
         // picker, or the feature after its intro) starts directly.
@@ -124,6 +134,7 @@ extension MediaPlayerManager {
     /// Called when playback stops.
     func bearfinWillStop() {
         cancelCreditsCountdown()
+        ThemeSongPlayer.shared.resumeAfterVideoPlayback()
     }
 
     /// Called after an item is rebuilt (audio, subtitle, or bitrate change).
@@ -156,7 +167,7 @@ extension MediaPlayerManager {
     /// Intros are skipped when disabled in settings, when resuming partway
     /// through, or when the server has none or the intro fails to load.
     func bearfinStartingPlaybackItem(for provider: MediaPlayerItemProvider) async throws -> MediaPlayerItem {
-        ThemeSongPlayer.shared.stop()
+        ThemeSongPlayer.shared.suspendForVideoPlayback()
 
         let isResuming = (provider.resolvedItem.startSeconds ?? .zero) > .zero
 
@@ -235,14 +246,8 @@ extension MediaPlayerManager {
     /// How long the Up Next countdown runs once the end credits start.
     private static let creditsCountdownLength = 5
 
-    /// The countdown has an on-screen card only on tvOS so far.
-    private static let supportsCreditsCountdown: Bool = {
-        #if os(tvOS)
-        true
-        #else
-        false
-        #endif
-    }()
+    /// The Up Next card now renders on tvOS, iOS, and iPadOS.
+    private static let supportsCreditsCountdown = true
 
     // Only touch `bearfin` when something actually changes: every write
     // republishes the manager, and this runs on every playback tick.
