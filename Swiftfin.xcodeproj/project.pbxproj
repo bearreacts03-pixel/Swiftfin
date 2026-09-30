@@ -523,6 +523,7 @@
 				E1A1B5C42F00000000000001 /* Run SwiftLint */,
 				5377CBED263B596A003A4E83 /* Sources */,
 				5377CBEE263B596A003A4E83 /* Frameworks */,
+				8B0AC72E306B89CD00BB90B9 /* ShellScript */,
 				5377CBEF263B596A003A4E83 /* Resources */,
 				E19009182F00000000000001 /* Write Git Branch */,
 			);
@@ -776,6 +777,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -eu\ncd \"${SRCROOT}\"\nxcrun --sdk macosx swift \"${SRCROOT}/Scripts/Translations/GenerateStrings.swift\"\n";
 		};
+		8B0AC72E306B89CD00BB90B9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "FRAMEWORK=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Libmpv.framework/Libmpv\"\n\nif [ -f \"$FRAMEWORK\" ] && lipo -info \"$FRAMEWORK\" 2>/dev/null | grep -q \"arm64e\"; then\n    echo \"Stripping arm64e from Libmpv\"\n    lipo -remove arm64e \"$FRAMEWORK\" -output \"$FRAMEWORK\"\n    codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" \"$(dirname \"$FRAMEWORK\")\"\nfi\n";
+		};
 		BD0BA2282AD64BB200306A8D /* Run SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -793,7 +812,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Add Homebrew to the path to support Apple Silicon Homebrew SwiftFormat installations\nexport PATH=/opt/homebrew/bin:$PATH\n\n# Skip phase if the action is not build (ie. analyze, archive, etc).\nif [ \"$ACTION\" != \"build\" ]; then\n    exit 0\nfi\n\nif which swiftformat >/dev/null; then\n    swiftformat .\nelse\n    echo \"error: SwiftFormat not installed, check contributing.md for installation instructions.\"\nfi\n";
+			shellScript = "FRAMEWORK=\"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Libmpv.framework/Libmpv\"\n\nif [ -f \"$FRAMEWORK\" ] && lipo -info \"$FRAMEWORK\" 2>/dev/null | grep -q \"arm64e\"; then\n    echo \"Stripping arm64e from Libmpv\"\n    lipo -remove arm64e \"$FRAMEWORK\" -output \"$FRAMEWORK\"\n    codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" \"$(dirname \"$FRAMEWORK\")\"\nfi\n";
 		};
 		BD83D7852B55EEB600652C24 /* Run SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1111,7 +1130,7 @@
 				CODE_SIGN_ENTITLEMENTS = Swiftfin/Resources/Swiftfin.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 22WESW8RTF;
 				ENABLE_APP_SANDBOX = YES;
@@ -1151,7 +1170,7 @@
 				CODE_SIGN_ENTITLEMENTS = Swiftfin/Resources/Swiftfin.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 22WESW8RTF;

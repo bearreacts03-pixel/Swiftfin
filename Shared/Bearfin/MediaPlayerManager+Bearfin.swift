@@ -11,6 +11,7 @@ import Defaults
 import FactoryKit
 import Foundation
 import JellyfinAPI
+import Logging
 
 // Bearfin's intro and end-credits features for the player.
 //
@@ -65,9 +66,13 @@ extension MediaPlayerManager {
         upNextContent != nil
     }
 
-    /// Skips the current intro and starts the requested item.
+    /// Skips the rest of the intro chain — however many trailers or
+    /// bumpers are left — and starts the requested item right away.
     func skipIntro() {
         guard let featureProvider = bearfin.pendingFeatureProvider else { return }
+        // Goes through the normal (non-chain) path in bearfinWillPlayNewItem,
+        // which clears pendingIntroQueue too — one skip always means
+        // straight to the feature, not just the next intro.
         playNewItem(provider: featureProvider)
     }
 
@@ -112,6 +117,15 @@ extension MediaPlayerManager {
 
     /// Called whenever a new playback item is set.
     func bearfinPlaybackItemDidChange(_ playbackItem: MediaPlayerItem) {
+        if isPlayingIntro {
+            // Every intro in the chain stays unreported — no play count,
+            // no resume position, no "played" status — not just the one
+            // played first. Done here (rather than inside the provider's
+            // build closure) because that closure is Sendable and can't
+            // touch this main-actor-only property directly.
+            playbackItem.observers.removeAll { $0 is MediaProgressObserver }
+        }
+
         resetCredits(for: playbackItem)
     }
 
@@ -125,16 +139,28 @@ extension MediaPlayerManager {
         // a theme song in over the video's audio.
         ThemeSongPlayer.shared.suspendForVideoPlayback()
 
-        // Intros only play when a playback session starts, so anything
-        // played within the session (autoplay, next/previous, the episode
-        // picker, or the feature after its intro) starts directly.
-        bearfin.pendingFeatureProvider = nil
+        if bearfin.isAdvancingIntroChain {
+            // Bearfin itself is hopping from one intro to the next in a
+            // chain (trailer → trailer → bumper). Leave the feature and
+            // the rest of the queue alone — only a genuinely new play
+            // below should clear them.
+            bearfin.isAdvancingIntroChain = false
+        } else {
+            // Intros only play when a playback session starts, so anything
+            // played within the session (autoplay, next/previous, the
+            // episode picker, or the feature after its intro chain) starts
+            // directly.
+            bearfin.pendingFeatureProvider = nil
+            bearfin.pendingIntroQueue = []
+        }
     }
 
     /// Called when playback stops.
     func bearfinWillStop() {
         cancelCreditsCountdown()
         ThemeSongPlayer.shared.resumeAfterVideoPlayback()
+        bearfin.pendingFeatureProvider = nil
+        bearfin.pendingIntroQueue = []
     }
 
     /// Called after an item is rebuilt (audio, subtitle, or bitrate change).
@@ -147,43 +173,54 @@ extension MediaPlayerManager {
 
     /// Called when playback ends. Returns `true` if Bearfin handled it.
     ///
-    /// An intro always continues into its feature, regardless of the
-    /// autoplay setting or whether the intro reports a runtime.
+    /// An intro chain always continues — into the next intro, or into the
+    /// feature once the chain is done — regardless of the autoplay setting
+    /// or whether the intro reports a runtime.
     func bearfinHandleEnded() async -> Bool {
-        guard let featureProvider = bearfin.pendingFeatureProvider else { return false }
+        guard bearfin.pendingFeatureProvider != nil else { return false }
 
         // Ended early (VLC can report this before the real end): ignore.
         if let runtime = item.runtime, (runtime - seconds) > .seconds(1) {
             return true
         }
 
+        // More intros queued (a trailer reel): play the next one instead
+        // of jumping to the feature yet.
+        if !bearfin.pendingIntroQueue.isEmpty {
+            let nextIntro = bearfin.pendingIntroQueue.removeFirst()
+            bearfin.isAdvancingIntroChain = true
+            await playNewItem(provider: nextIntro)
+            return true
+        }
+
+        guard let featureProvider = bearfin.pendingFeatureProvider else { return false }
         await playNewItem(provider: featureProvider)
         return true
     }
 
-    /// Builds the first item of a playback session: an intro when one should
-    /// play, otherwise the item itself.
+    /// Builds the first item of a playback session: the first intro in the
+    /// chain when there is one, otherwise the item itself.
     ///
     /// Intros are skipped when disabled in settings, when resuming partway
-    /// through, or when the server has none or the intro fails to load.
+    /// through, or when the server has none or the first fails to load.
     func bearfinStartingPlaybackItem(for provider: MediaPlayerItemProvider) async throws -> MediaPlayerItem {
         ThemeSongPlayer.shared.suspendForVideoPlayback()
 
         let isResuming = (provider.resolvedItem.startSeconds ?? .zero) > .zero
 
-        if !isResuming,
-           let introProvider = await Self.introProvider(for: provider.item),
-           let introItem = try? await introProvider()
-        {
-            // Intros are not reported to the server, so they never
-            // gain a play count, a resume position, or "played" status.
-            introItem.observers.removeAll { $0 is MediaProgressObserver }
+        if !isResuming {
+            let introProviders = await Self.introProviders(for: provider.item)
 
-            bearfin.pendingFeatureProvider = provider
-            return introItem
+            if let firstIntro = introProviders.first, let firstItem = try? await firstIntro() {
+                bearfin.pendingFeatureProvider = provider
+                // Everything after the first plays in order as each one ends.
+                bearfin.pendingIntroQueue = Array(introProviders.dropFirst())
+                return firstItem
+            }
         }
 
         bearfin.pendingFeatureProvider = nil
+        bearfin.pendingIntroQueue = []
         return try await provider()
     }
 
@@ -214,27 +251,60 @@ extension MediaPlayerManager {
 
 extension MediaPlayerManager {
 
-    /// Returns a provider for the first intro the server has for `item`, or `nil`
-    /// if intros are disabled, the server has none, or the request fails.
-    private static func introProvider(for item: BaseItemDto) async -> MediaPlayerItemProvider? {
-        guard Defaults[.Bearfin.playIntros] else { return nil }
-        guard let itemID = item.id, let userSession = Container.shared.currentUserSession() else { return nil }
+    private static let introLogger = Logger.swiftfin()
+
+    /// Returns providers for every intro the server has for `item`, in the
+    /// order they should play — a trailer reel, ending with a bumper — or
+    /// an empty list if intros are disabled, the server has none, or the
+    /// request fails.
+    private static func introProviders(for item: BaseItemDto) async -> [MediaPlayerItemProvider] {
+        guard Defaults[.Bearfin.playIntros] else {
+            introLogger.info("Intro lookup skipped: Play intros is off in Settings")
+            return []
+        }
+        guard let itemID = item.id, let userSession = Container.shared.currentUserSession() else {
+            introLogger.info("Intro lookup skipped: no item ID or no active server session")
+            return []
+        }
 
         do {
             let request = Paths.getIntros(itemID: itemID, userID: userSession.user.id)
             let response = try await userSession.client.send(request)
+            let items = response.value.items ?? []
+            let files = items.map { $0.path ?? "?" }.joined(separator: ", ")
 
-            guard let introItem = response.value.items?.first else { return nil }
+            introLogger.info(
+                "Intro lookup",
+                metadata: [
+                    "item": .stringConvertible(item.displayTitle),
+                    "found": .stringConvertible(items.count),
+                    "files": .stringConvertible(files.isEmpty ? "none" : files),
+                ]
+            )
 
-            return MediaPlayerItemProvider(item: introItem) { item, modifyItem in
-                try await MediaPlayerItem.build(for: item) { item in
-                    // Always start an intro from the beginning.
-                    item.userData?.playbackPositionTicks = .zero
-                    modifyItem?(&item)
+            return items.map { introItem in
+                MediaPlayerItemProvider(item: introItem) { item, modifyItem in
+                    try await MediaPlayerItem.build(for: item) { item in
+                        // Always start each intro in the chain from the beginning.
+                        item.userData?.playbackPositionTicks = .zero
+                        modifyItem?(&item)
+                    }
+                    // Not reporting this to the server happens once the
+                    // item is actually playing — see bearfinPlaybackItemDidChange.
                 }
             }
         } catch {
-            return nil
+            // Previously silent: a failed request (bad response, wrong
+            // endpoint, plugin not responding) looked identical to "no
+            // intro found." Log it so the two are distinguishable.
+            introLogger.error(
+                "Intro lookup failed",
+                metadata: [
+                    "item": .stringConvertible(item.displayTitle),
+                    "error": .stringConvertible(error.localizedDescription),
+                ]
+            )
+            return []
         }
     }
 }

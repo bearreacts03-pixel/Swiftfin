@@ -15,9 +15,19 @@ struct BearfinPlaybackState {
 
     // MARK: Intros
 
-    /// The item waiting to play once the current intro finishes.
-    /// Non-nil only while an intro is playing.
+    /// The item waiting to play once every intro in the current chain
+    /// finishes. Non-nil for as long as any intro is playing — the first
+    /// trailer through the last.
     var pendingFeatureProvider: MediaPlayerItemProvider?
+
+    /// Intros still to play after the current one, in order (a trailer
+    /// reel: trailer, trailer, bumper, then the feature).
+    var pendingIntroQueue: [MediaPlayerItemProvider] = []
+
+    /// Set just before Bearfin hands off from one intro to the next in the
+    /// chain, so the "a new play session always clears pending intros"
+    /// rule doesn't wipe out the chain it's in the middle of running.
+    var isAdvancingIntroChain = false
 
     // MARK: Credits
 
