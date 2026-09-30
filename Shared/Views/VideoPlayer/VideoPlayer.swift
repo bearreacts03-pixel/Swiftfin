@@ -42,8 +42,6 @@ struct VideoPlayer: View {
 
     init() {
         switch Defaults[.VideoPlayer.videoPlayerType] {
-        case .mpv:
-            self._proxy = .init(wrappedValue: MPVMediaPlayerProxy())
         case .native, .vlc:
             self._proxy = .init(wrappedValue: VLCMediaPlayerProxy())
         }

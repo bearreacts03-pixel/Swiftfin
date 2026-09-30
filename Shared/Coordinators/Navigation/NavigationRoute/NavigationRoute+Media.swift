@@ -97,7 +97,7 @@ struct VideoPlayerViewShim: View {
             switch Defaults[.VideoPlayer.videoPlayerType] {
             case .native:
                 NativeVideoPlayer()
-            case .vlc, .mpv:
+            case .vlc:
                 VideoPlayer()
             }
         }

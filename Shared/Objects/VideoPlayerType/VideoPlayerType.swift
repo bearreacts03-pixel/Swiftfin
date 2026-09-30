@@ -13,7 +13,6 @@ enum VideoPlayerType: String, CaseIterable, Displayable, SupportedCaseIterable, 
 
     case native
     case vlc
-    case mpv
 
     var displayTitle: String {
         switch self {
@@ -21,8 +20,6 @@ enum VideoPlayerType: String, CaseIterable, Displayable, SupportedCaseIterable, 
             L10n.native
         case .vlc:
             L10n.vlc
-        case .mpv:
-            L10n.mpv
         }
     }
 
@@ -30,7 +27,7 @@ enum VideoPlayerType: String, CaseIterable, Displayable, SupportedCaseIterable, 
         switch self {
         case .native:
             Self._nativeDirectPlayProfiles
-        case .vlc, .mpv:
+        case .vlc:
             Self._vlcDirectPlayProfiles
         }
     }
@@ -39,7 +36,7 @@ enum VideoPlayerType: String, CaseIterable, Displayable, SupportedCaseIterable, 
         switch self {
         case .native:
             Self._nativeTranscodingProfiles
-        case .vlc, .mpv:
+        case .vlc:
             Self._vlcTranscodingProfiles
         }
     }
@@ -48,7 +45,7 @@ enum VideoPlayerType: String, CaseIterable, Displayable, SupportedCaseIterable, 
         switch self {
         case .native:
             Self._nativeSubtitleProfiles
-        case .vlc, .mpv:
+        case .vlc:
             Self._vlcSubtitleProfiles
         }
     }
@@ -57,9 +54,5 @@ enum VideoPlayerType: String, CaseIterable, Displayable, SupportedCaseIterable, 
     static var supportedCases: [VideoPlayerType] {
         VideoPlayerType.native
         VideoPlayerType.vlc
-
-        if Defaults[.Experimental.mpvPlayer] {
-            VideoPlayerType.mpv
-        }
     }
 }
