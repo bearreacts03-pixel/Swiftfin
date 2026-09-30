@@ -180,14 +180,14 @@
 			membershipExceptions = (
 				Resources/Info.plist,
 			);
-			target = 5377CBF0263B596A003A4E83 /* Swiftfin iOS */;
+			target = 5377CBF0263B596A003A4E83 /* Bearfin iOS */;
 		};
 		E14561A32DFCAE51008FF700 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/Assets.xcassets,
 			);
-			target = 5358705F2669D21600D05A09 /* Swiftfin tvOS */;
+			target = 5358705F2669D21600D05A09 /* Bearfin tvOS */;
 		};
 		E14565D92DFCAE6E008FF700 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -207,14 +207,14 @@
 				Views/ItemView/Components/ActionButtons/EditActionButton.swift,
 				Views/VideoPlayer/Components/Toolbar/ActionButtons/GestureLockActionButton.swift,
 			);
-			target = 5358705F2669D21600D05A09 /* Swiftfin tvOS */;
+			target = 5358705F2669D21600D05A09 /* Bearfin tvOS */;
 		};
 		E14567272DFCAEFD008FF700 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/Info.plist,
 			);
-			target = 5358705F2669D21600D05A09 /* Swiftfin tvOS */;
+			target = 5358705F2669D21600D05A09 /* Bearfin tvOS */;
 		};
 		E1BE3EDA2FE9DAE800327990 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -222,7 +222,7 @@
 				DevelopmentTeam.xcconfig,
 				Shared.xcconfig,
 			);
-			target = 5377CBF0263B596A003A4E83 /* Swiftfin iOS */;
+			target = 5377CBF0263B596A003A4E83 /* Bearfin iOS */;
 		};
 		E1BE3EDB2FE9DAE800327990 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -230,7 +230,7 @@
 				DevelopmentTeam.xcconfig,
 				Shared.xcconfig,
 			);
-			target = 5358705F2669D21600D05A09 /* Swiftfin tvOS */;
+			target = 5358705F2669D21600D05A09 /* Bearfin tvOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -454,9 +454,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5358705F2669D21600D05A09 /* Swiftfin tvOS */ = {
+		5358705F2669D21600D05A09 /* Bearfin tvOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 535870712669D21700D05A09 /* Build configuration list for PBXNativeTarget "Swiftfin tvOS" */;
+			buildConfigurationList = 535870712669D21700D05A09 /* Build configuration list for PBXNativeTarget "Bearfin tvOS" */;
 			buildPhases = (
 				6286F0A3271C0ABA00C40ED5 /* Generate Strings */,
 				BD83D7852B55EEB600652C24 /* Run SwiftFormat */,
@@ -476,7 +476,7 @@
 				E1456FC82DFCB323008FF700 /* Translations */,
 				E150B7D12DFF2E7C00DC7CF4 /* XcodeConfig */,
 			);
-			name = "Swiftfin tvOS";
+			name = "Bearfin tvOS";
 			packageProductDependencies = (
 				E13DD3CC27164CA7009D4DAF /* CoreStore */,
 				E12186DD2718F1C50010884C /* Defaults */,
@@ -509,9 +509,9 @@
 			productReference = 535870602669D21600D05A09 /* Bearfin.app */;
 			productType = "com.apple.product-type.application";
 		};
-		5377CBF0263B596A003A4E83 /* Swiftfin iOS */ = {
+		5377CBF0263B596A003A4E83 /* Bearfin iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5377CC1B263B596B003A4E83 /* Build configuration list for PBXNativeTarget "Swiftfin iOS" */;
+			buildConfigurationList = 5377CC1B263B596B003A4E83 /* Build configuration list for PBXNativeTarget "Bearfin iOS" */;
 			buildPhases = (
 				6286F09E271C093000C40ED5 /* Generate Strings */,
 				BD0BA2282AD64BB200306A8D /* Run SwiftFormat */,
@@ -531,7 +531,7 @@
 				E1456FC82DFCB323008FF700 /* Translations */,
 				E150B7D12DFF2E7C00DC7CF4 /* XcodeConfig */,
 			);
-			name = "Swiftfin iOS";
+			name = "Bearfin iOS";
 			packageProductDependencies = (
 				E13DD3C52716499E009D4DAF /* CoreStore */,
 				E13DD3D227168E65009D4DAF /* Defaults */,
@@ -610,7 +610,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5377CBEC263B596A003A4E83 /* Build configuration list for PBXProject "Swiftfin" */;
+			buildConfigurationList = 5377CBEC263B596A003A4E83 /* Build configuration list for PBXProject "Bearfin" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -703,8 +703,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5377CBF0263B596A003A4E83 /* Swiftfin iOS */,
-				5358705F2669D21600D05A09 /* Swiftfin tvOS */,
+				5377CBF0263B596A003A4E83 /* Bearfin iOS */,
+				5358705F2669D21600D05A09 /* Bearfin tvOS */,
 			);
 		};
 /* End PBXProject section */
@@ -1182,7 +1182,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		535870712669D21700D05A09 /* Build configuration list for PBXNativeTarget "Swiftfin tvOS" */ = {
+		535870712669D21700D05A09 /* Build configuration list for PBXNativeTarget "Bearfin tvOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				535870722669D21700D05A09 /* Debug */,
@@ -1191,7 +1191,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5377CBEC263B596A003A4E83 /* Build configuration list for PBXProject "Swiftfin" */ = {
+		5377CBEC263B596A003A4E83 /* Build configuration list for PBXProject "Bearfin" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5377CC19263B596B003A4E83 /* Debug */,
@@ -1200,7 +1200,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5377CC1B263B596B003A4E83 /* Build configuration list for PBXNativeTarget "Swiftfin iOS" */ = {
+		5377CC1B263B596B003A4E83 /* Build configuration list for PBXNativeTarget "Bearfin iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5377CC1C263B596B003A4E83 /* Debug */,
