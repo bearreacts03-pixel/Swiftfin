@@ -17,6 +17,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5377CBF0263B596A003A4E83"
                BuildableName = "Swiftfin.app"
+               BlueprintName = "Swiftfin iOS"
                ReferencedContainer = "container:Swiftfin.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,6 +47,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5377CBF0263B596A003A4E83"
             BuildableName = "Swiftfin.app"
+            BlueprintName = "Swiftfin iOS"
             ReferencedContainer = "container:Swiftfin.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,6 +64,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5377CBF0263B596A003A4E83"
             BuildableName = "Swiftfin.app"
+            BlueprintName = "Swiftfin iOS"
             ReferencedContainer = "container:Swiftfin.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
