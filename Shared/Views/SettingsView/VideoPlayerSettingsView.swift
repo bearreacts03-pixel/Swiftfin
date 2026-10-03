@@ -314,7 +314,7 @@ struct VideoPlayerSettingsView: View {
             ))
 
             PlatformPicker(L10n.subtitleMode, selection: Binding(
-                get: { viewModel.user.configuration?.subtitleMode ?? .default },
+                get: { viewModel.user.configuration?.subtitleMode ?? .none },
                 set: { newValue in
                     updateConfiguration { $0.subtitleMode = newValue }
                 }
