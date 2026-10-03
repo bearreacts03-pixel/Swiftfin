@@ -22,6 +22,9 @@ struct PosterButton<Item: Poster>: View {
     @State
     private var posterSize: CGSize = .zero
 
+    @Environment(\.isFocused)
+    private var isFocused
+
     let item: Item
     let displayType: PosterDisplayType
     let size: PosterDisplayType.Size
@@ -99,6 +102,12 @@ struct PosterButton<Item: Poster>: View {
         .buttonBorderShape(.roundedRectangle)
         #if os(tvOS)
         .focusedValue(\.focusedPoster, AnyPoster(item))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.green, lineWidth: 4)
+                .opacity(isFocused ? 1 : 0)
+                .animation(.easeInOut(duration: 0.15), value: isFocused)
+        }
         .frame(maxWidth: .infinity, alignment: .leading)
         .ignoresSafeArea()
         #endif
