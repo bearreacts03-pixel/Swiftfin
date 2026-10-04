@@ -84,6 +84,7 @@ struct PosterButton<Item: Poster>: View {
             posterImage(overlay: item.posterOverlay(for: displayType))
                 .posterAspectRatio(displayType, contentMode: .fit)
                 .frame(width: posterSize.width > 0 ? posterSize.width : nil)
+        
 
             if posterConfiguration.showLabels {
                 item.posterLabel
@@ -99,7 +100,7 @@ struct PosterButton<Item: Poster>: View {
         .buttonBorderShape(.roundedRectangle)
         #if os(tvOS)
         .focusedValue(\.focusedPoster, AnyPoster(item))
-        .overlay { FocusBorderOverlay() }
+
         .frame(maxWidth: .infinity, alignment: .leading)
         .ignoresSafeArea()
         #endif
