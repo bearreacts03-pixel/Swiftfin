@@ -161,9 +161,16 @@ class BearMusicViewModel: ObservableObject {
         }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            let response = try JSONDecoder().decode(AlbumListResponse.self, from: data)
-            return response.subsonic_response.albumList2?.album ?? []
-        } catch { return [] }
+            if let json = String(data: data, encoding: .utf8) {
+                print("BEARMUSIC ARTIST RAW: \(json.prefix(200))")
+            }
+            let response = try JSONDecoder().decode(ArtistDetailResponse.self, from: data)
+            print("BEARMUSIC ARTIST DECODED: \(response.subsonicResponse.artist?.name ?? "nil") count=\(response.subsonicResponse.artist?.album?.count ?? -1)")
+            return response.subsonicResponse.artist?.album ?? []
+        } catch {
+            print("BEARMUSIC ARTIST CATCH: \(error)")
+            return []
+        }
     }
 
     func fetchPlaylists() async -> [BearMusicPlaylist] {
