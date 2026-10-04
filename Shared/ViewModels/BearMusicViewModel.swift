@@ -154,21 +154,19 @@ class BearMusicViewModel: ObservableObject {
 
     func fetchArtistAlbums(artistId: String) async -> [BearMusicAlbum] {
         let urlString = "\(baseURL)/rest/getArtist?\(authParams())&id=\(artistId)&f=json"
-        print("BEARMUSIC ARTIST URL: \(urlString)")
         guard let url = URL(string: urlString) else {
-            print("BEARMUSIC ARTIST URL FAILED TO BUILD")
             return []
         }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             if let json = String(data: data, encoding: .utf8) {
-                print("BEARMUSIC ARTIST RAW: \(json.prefix(200))")
             }
             let response = try JSONDecoder().decode(ArtistDetailResponse.self, from: data)
-            print("BEARMUSIC ARTIST DECODED: \(response.subsonicResponse.artist?.name ?? "nil") count=\(response.subsonicResponse.artist?.album?.count ?? -1)")
+            print(
+                "BEARMUSIC ARTIST DECODED: \(response.subsonicResponse.artist?.name ?? "nil") count=\(response.subsonicResponse.artist?.album?.count ?? -1)"
+            )
             return response.subsonicResponse.artist?.album ?? []
         } catch {
-            print("BEARMUSIC ARTIST CATCH: \(error)")
             return []
         }
     }
