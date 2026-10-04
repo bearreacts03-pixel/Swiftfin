@@ -159,8 +159,7 @@ class BearMusicViewModel: ObservableObject {
         }
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            if let json = String(data: data, encoding: .utf8) {
-            }
+            if let json = String(data: data, encoding: .utf8) {}
             let response = try JSONDecoder().decode(ArtistDetailResponse.self, from: data)
             print(
                 "BEARMUSIC ARTIST DECODED: \(response.subsonicResponse.artist?.name ?? "nil") count=\(response.subsonicResponse.artist?.album?.count ?? -1)"

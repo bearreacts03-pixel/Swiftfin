@@ -323,7 +323,7 @@ struct BearMusicAlbumDetailView: View {
             .padding()
         }
         .background(Color.black)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
         .task { songs = await viewModel.fetchAlbumSongs(albumId: album.id) }
     }
 }
@@ -377,7 +377,7 @@ struct BearMusicArtistDetailView: View {
             .padding()
         }
         .background(Color.black)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
         .task {
             albums = await viewModel.fetchArtistAlbums(artistId: artist.id)
         }
