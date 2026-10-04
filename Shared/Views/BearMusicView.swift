@@ -14,14 +14,12 @@ struct BearMusicView: View {
     private var viewModel = BearMusicViewModel()
 
     var body: some View {
-        Group {
-            if viewModel.isLoggedIn {
-                BearMusicHomeView(viewModel: viewModel)
-            } else {
-                NavigationStack {
-                    BearMusicLoginView(viewModel: viewModel)
-                        .navigationTitle("Bear Music")
-                }
+        if viewModel.isLoggedIn {
+            BearMusicHomeView(viewModel: viewModel)
+        } else {
+            NavigationStack {
+                BearMusicLoginView(viewModel: viewModel)
+                    .navigationTitle("Bear Music")
             }
         }
     }

@@ -1,21 +1,18 @@
 //
-// Swiftfin is subject to the terms of the Mozilla Public
-// License, v2.0. If a copy of the MPL was not distributed with this
-// file, you can obtain one at https://mozilla.org/MPL/2.0/.
-//
-// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
+// Bearfin
+// BearMusicHomeView.swift
 //
 
 import SwiftUI
 
 struct BearMusicHomeView: View {
-    @ObservedObject
-    var viewModel: BearMusicViewModel
-    @State
-    private var selectedTab = 0
+    @ObservedObject var viewModel: BearMusicViewModel
+    @State private var selectedTab = 0
+    @State private var selectedArtist: BearMusicArtist? = nil
+    @State private var selectedAlbum: BearMusicAlbum? = nil
 
     var body: some View {
-        NavigationStack {
+        ZStack {
             VStack(spacing: 0) {
                 Picker("", selection: $selectedTab) {
                     Text("Home").tag(0)
@@ -27,9 +24,9 @@ struct BearMusicHomeView: View {
                 .padding()
 
                 switch selectedTab {
-                case 0: BearMusicDiscoverView(viewModel: viewModel)
-                case 1: BearMusicAlbumsView(viewModel: viewModel)
-                case 2: BearMusicArtistsView(viewModel: viewModel)
+                case 0: BearMusicDiscoverView(viewModel: viewModel, selectedAlbum: $selectedAlbum)
+                case 1: BearMusicAlbumsView(viewModel: viewModel, selectedAlbum: $selectedAlbum)
+                case 2: BearMusicArtistsView(viewModel: viewModel, selectedArtist: $selectedArtist)
                 case 3: BearMusicPlaylistsView(viewModel: viewModel)
                 default: EmptyView()
                 }
@@ -38,24 +35,44 @@ struct BearMusicHomeView: View {
                     BearMusicNowPlayingBar(viewModel: viewModel, song: song)
                 }
             }
-            .navigationTitle("Bear Music")
-            .task { await viewModel.loadHome() }
+
+            if let artist = selectedArtist {
+                BearMusicArtistDetailView(
+                    artist: artist,
+                    viewModel: viewModel,
+                    onBack: { selectedArtist = nil },
+                    selectedAlbum: $selectedAlbum
+                )
+                .transition(.move(edge: .trailing))
+            }
+
+            if let album = selectedAlbum {
+                BearMusicAlbumDetailView(
+                    album: album,
+                    viewModel: viewModel,
+                    onBack: { selectedAlbum = nil }
+                )
+                .transition(.move(edge: .trailing))
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: selectedArtist?.id)
+        .animation(.easeInOut(duration: 0.25), value: selectedAlbum?.id)
+        .task { await viewModel.loadHome() }
     }
 }
 
 struct BearMusicDiscoverView: View {
-    @ObservedObject
-    var viewModel: BearMusicViewModel
+    @ObservedObject var viewModel: BearMusicViewModel
+    @Binding var selectedAlbum: BearMusicAlbum?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 if !viewModel.recentAlbums.isEmpty {
-                    BearMusicAlbumRow(title: "Recently Added", albums: viewModel.recentAlbums, viewModel: viewModel)
+                    BearMusicAlbumRow(title: "Recently Added", albums: viewModel.recentAlbums, viewModel: viewModel, selectedAlbum: $selectedAlbum)
                 }
                 if !viewModel.randomAlbums.isEmpty {
-                    BearMusicAlbumRow(title: "Random Pick", albums: viewModel.randomAlbums, viewModel: viewModel)
+                    BearMusicAlbumRow(title: "Random Pick", albums: viewModel.randomAlbums, viewModel: viewModel, selectedAlbum: $selectedAlbum)
                 }
             }
             .padding()
@@ -66,8 +83,8 @@ struct BearMusicDiscoverView: View {
 struct BearMusicAlbumRow: View {
     let title: String
     let albums: [BearMusicAlbum]
-    @ObservedObject
-    var viewModel: BearMusicViewModel
+    @ObservedObject var viewModel: BearMusicViewModel
+    @Binding var selectedAlbum: BearMusicAlbum?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -75,9 +92,7 @@ struct BearMusicAlbumRow: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(albums) { album in
-                        NavigationLink {
-                            BearMusicAlbumDetailView(album: album, viewModel: viewModel)
-                        } label: {
+                        Button { selectedAlbum = album } label: {
                             BearMusicAlbumCard(album: album, viewModel: viewModel)
                         }
                         .buttonStyle(.plain)
@@ -90,8 +105,7 @@ struct BearMusicAlbumRow: View {
 
 struct BearMusicAlbumCard: View {
     let album: BearMusicAlbum
-    @ObservedObject
-    var viewModel: BearMusicViewModel
+    @ObservedObject var viewModel: BearMusicViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -113,19 +127,16 @@ struct BearMusicAlbumCard: View {
 }
 
 struct BearMusicAlbumsView: View {
-    @ObservedObject
-    var viewModel: BearMusicViewModel
-    @State
-    private var albums: [BearMusicAlbum] = []
+    @ObservedObject var viewModel: BearMusicViewModel
+    @Binding var selectedAlbum: BearMusicAlbum?
+    @State private var albums: [BearMusicAlbum] = []
     let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(albums) { album in
-                    NavigationLink {
-                        BearMusicAlbumDetailView(album: album, viewModel: viewModel)
-                    } label: {
+                    Button { selectedAlbum = album } label: {
                         BearMusicAlbumCard(album: album, viewModel: viewModel)
                     }
                     .buttonStyle(.plain)
@@ -138,44 +149,44 @@ struct BearMusicAlbumsView: View {
 }
 
 struct BearMusicArtistsView: View {
-    @ObservedObject
-    var viewModel: BearMusicViewModel
-    @State
-    private var artists: [BearMusicArtist] = []
+    @ObservedObject var viewModel: BearMusicViewModel
+    @Binding var selectedArtist: BearMusicArtist?
+    @State private var artists: [BearMusicArtist] = []
+    let columns = [GridItem(.adaptive(minimum: 200), spacing: 16)]
 
     var body: some View {
-        List(artists) { artist in
-            NavigationLink {
-                BearMusicArtistDetailView(artist: artist, viewModel: viewModel)
-            } label: {
-                HStack {
-                    AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 60) }) { image in
-                        image.resizable().aspectRatio(1, contentMode: .fill)
-                    } placeholder: {
-                        Circle().fill(Color.secondary.opacity(0.3))
-                            .overlay(Image(systemName: "music.mic").font(.caption))
-                    }
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(artists) { artist in
+                    Button { selectedArtist = artist } label: {
+                        VStack(spacing: 8) {
+                            AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 150) }) { image in
+                                image.resizable().aspectRatio(1, contentMode: .fill)
+                            } placeholder: {
+                                Circle().fill(Color.secondary.opacity(0.3))
+                                    .overlay(Image(systemName: "music.mic").font(.title))
+                            }
+                            .frame(width: 150, height: 150)
+                            .clipShape(Circle())
 
-                    VStack(alignment: .leading) {
-                        Text(artist.name).fontWeight(.semibold)
-                        if let count = artist.albumCount {
-                            Text("\(count) albums").font(.caption).foregroundStyle(.secondary)
+                            Text(artist.name).fontWeight(.semibold).lineLimit(1)
+                            if let count = artist.albumCount {
+                                Text("\(count) albums").font(.caption).foregroundStyle(.secondary)
+                            }
                         }
                     }
+                    .buttonStyle(.plain)
                 }
             }
+            .padding()
         }
         .task { artists = await viewModel.fetchArtists() }
     }
 }
 
 struct BearMusicPlaylistsView: View {
-    @ObservedObject
-    var viewModel: BearMusicViewModel
-    @State
-    private var playlists: [BearMusicPlaylist] = []
+    @ObservedObject var viewModel: BearMusicViewModel
+    @State private var playlists: [BearMusicPlaylist] = []
 
     var body: some View {
         List(playlists) { playlist in
@@ -203,79 +214,138 @@ struct BearMusicPlaylistsView: View {
 
 struct BearMusicAlbumDetailView: View {
     let album: BearMusicAlbum
-    @ObservedObject
-    var viewModel: BearMusicViewModel
-    @State
-    private var songs: [BearMusicSong] = []
+    @ObservedObject var viewModel: BearMusicViewModel
+    let onBack: () -> Void
+    @State private var songs: [BearMusicSong] = []
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                AsyncImage(url: album.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 400) }) { image in
-                    image.resizable().aspectRatio(1, contentMode: .fit)
-                } placeholder: {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.secondary.opacity(0.3))
-                        .overlay(Image(systemName: "music.note").font(.largeTitle))
-                }
-                .frame(maxWidth: 300)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                VStack(spacing: 4) {
-                    Text(album.name).font(.title2).fontWeight(.bold)
-                    Text(album.artist ?? "Unknown Artist").foregroundStyle(.secondary)
-                    if let year = album.year {
-                        Text(String(year)).foregroundStyle(.secondary).font(.caption)
+        ZStack(alignment: .topLeading) {
+            ScrollView {
+                VStack(spacing: 20) {
+                    AsyncImage(url: album.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 400) }) { image in
+                        image.resizable().aspectRatio(1, contentMode: .fit)
+                    } placeholder: {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.secondary.opacity(0.3))
+                            .overlay(Image(systemName: "music.note").font(.largeTitle))
                     }
-                }
+                    .frame(maxWidth: 300)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                Button {
-                    if !songs.isEmpty {
-                        viewModel.play(song: songs[0], queue: songs)
+                    VStack(spacing: 4) {
+                        Text(album.name).font(.title2).fontWeight(.bold)
+                        Text(album.artist ?? "Unknown Artist").foregroundStyle(.secondary)
+                        if let year = album.year { Text(String(year)).foregroundStyle(.secondary).font(.caption) }
                     }
-                } label: {
-                    Label("Play All", systemImage: "play.fill")
-                        .padding(.horizontal, 24).padding(.vertical, 12)
-                        .background(Color.green).foregroundStyle(.white)
-                        .clipShape(Capsule())
-                }
 
-                LazyVStack(alignment: .leading, spacing: 0) {
-                    ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
-                        Button {
-                            viewModel.play(song: song, queue: songs)
-                        } label: {
-                            HStack {
-                                Text("\(index + 1)").font(.caption).foregroundStyle(.secondary).frame(width: 24)
-                                VStack(alignment: .leading) {
-                                    Text(song.title).fontWeight(.medium)
-                                    if let artist = song.artist {
-                                        Text(artist).font(.caption).foregroundStyle(.secondary)
+                    Button {
+                        if !songs.isEmpty { viewModel.play(song: songs[0], queue: songs) }
+                    } label: {
+                        Label("Play All", systemImage: "play.fill")
+                            .padding(.horizontal, 24).padding(.vertical, 12)
+                            .background(Color.green).foregroundStyle(.white)
+                            .clipShape(Capsule())
+                    }
+
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(Array(songs.enumerated()), id: \.element.id) { index, song in
+                            Button {
+                                viewModel.play(song: song, queue: songs)
+                            } label: {
+                                HStack {
+                                    Text("\(index + 1)").font(.caption).foregroundStyle(.secondary).frame(width: 24)
+                                    VStack(alignment: .leading) {
+                                        Text(song.title).fontWeight(.medium)
+                                        if let artist = song.artist {
+                                            Text(artist).font(.caption).foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    Spacer()
+                                    if let duration = song.duration {
+                                        Text(String(format: "%d:%02d", duration / 60, duration % 60))
+                                            .font(.caption).foregroundStyle(.secondary)
                                     }
                                 }
-                                Spacer()
-                                if let duration = song.duration {
-                                    Text(String(format: "%d:%02d", duration / 60, duration % 60))
-                                        .font(.caption).foregroundStyle(.secondary)
-                                }
+                                .padding(.vertical, 10).padding(.horizontal)
                             }
-                            .padding(.vertical, 10).padding(.horizontal)
+                            .buttonStyle(.plain)
+                            Divider().padding(.leading)
                         }
-                        .buttonStyle(.plain)
-                        Divider().padding(.leading)
                     }
                 }
+                .padding()
+                .padding(.top, 60)
+            }
+
+            Button(action: onBack) {
+                Label("Back", systemImage: "chevron.left")
+                    .padding(12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             .padding()
         }
-        .navigationTitle(album.name)
+        .background(Color(.systemBackground))
         .task { songs = await viewModel.fetchAlbumSongs(albumId: album.id) }
     }
 }
 
+struct BearMusicArtistDetailView: View {
+    let artist: BearMusicArtist
+    @ObservedObject var viewModel: BearMusicViewModel
+    let onBack: () -> Void
+    @Binding var selectedAlbum: BearMusicAlbum?
+    @State private var albums: [BearMusicAlbum] = []
+    let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            ScrollView {
+                VStack(spacing: 20) {
+                    AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 300) }) { image in
+                        image.resizable().aspectRatio(1, contentMode: .fill)
+                    } placeholder: {
+                        Circle().fill(Color.secondary.opacity(0.3))
+                            .overlay(Image(systemName: "music.mic").font(.largeTitle))
+                    }
+                    .frame(width: 200, height: 200)
+                    .clipShape(Circle())
+
+                    Text(artist.name).font(.title).fontWeight(.bold)
+
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(albums) { album in
+                            Button { selectedAlbum = album } label: {
+                                BearMusicAlbumCard(album: album, viewModel: viewModel)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding()
+                }
+                .padding()
+                .padding(.top, 60)
+            }
+
+            Button(action: onBack) {
+                Label("Back", systemImage: "chevron.left")
+                    .padding(12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            .padding()
+        }
+        .background(Color(.systemBackground))
+        .task {
+            print("BEARMUSIC ARTIST DETAIL: loading albums for \(artist.name) id=\(artist.id)")
+            albums = await viewModel.fetchArtistAlbums(artistId: artist.id)
+            print("BEARMUSIC ARTIST DETAIL: got \(albums.count) albums")
+        }
+    }
+}
+
 struct BearMusicNowPlayingBar: View {
-    @ObservedObject
-    var viewModel: BearMusicViewModel
+    @ObservedObject var viewModel: BearMusicViewModel
     let song: BearMusicSong
 
     var body: some View {
@@ -293,9 +363,7 @@ struct BearMusicNowPlayingBar: View {
                 Text(song.artist ?? "").font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
             Spacer()
-            Button {
-                viewModel.togglePlayPause()
-            } label: {
+            Button { viewModel.togglePlayPause() } label: {
                 Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill").font(.title2)
             }
             .buttonStyle(.plain)
