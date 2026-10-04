@@ -186,6 +186,7 @@ struct BearMusicArtistsView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(artists) { artist in
+                    Button {
                         selectedArtist = artist
                     } label: {
                         VStack(spacing: 8) {
@@ -209,8 +210,8 @@ struct BearMusicArtistsView: View {
             }
             .padding()
         }
+        .task { artists = await viewModel.fetchArtists() }
     }
-    .task { artists = await viewModel.fetchArtists() }
 }
 
 struct BearMusicPlaylistsView: View {
