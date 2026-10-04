@@ -19,52 +19,46 @@ struct BearMusicHomeView: View {
     private var selectedAlbum: BearMusicAlbum? = nil
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                Picker("", selection: $selectedTab) {
-                    Text("Home").tag(0)
-                    Text("Albums").tag(1)
-                    Text("Artists").tag(2)
-                    Text("Playlists").tag(3)
-                }
-                .pickerStyle(.segmented)
-                .padding()
-
-                switch selectedTab {
-                case 0: BearMusicDiscoverView(viewModel: viewModel, selectedAlbum: $selectedAlbum)
-                case 1: BearMusicAlbumsView(viewModel: viewModel, selectedAlbum: $selectedAlbum)
-                case 2: BearMusicArtistsView(viewModel: viewModel, selectedArtist: $selectedArtist)
-                case 3: BearMusicPlaylistsView(viewModel: viewModel)
-                default: EmptyView()
-                }
-
-                if let song = viewModel.currentSong {
-                    BearMusicNowPlayingBar(viewModel: viewModel, song: song)
-                }
-            }
-
-            if let artist = selectedArtist {
-                BearMusicArtistDetailView(
-                    artist: artist,
-                    viewModel: viewModel,
-                    onBack: { selectedArtist = nil },
-                    selectedAlbum: $selectedAlbum
-                )
-                .transition(.move(edge: .trailing))
-            }
-
+        Group {
             if let album = selectedAlbum {
                 BearMusicAlbumDetailView(
                     album: album,
                     viewModel: viewModel,
                     onBack: { selectedAlbum = nil }
                 )
-                .transition(.move(edge: .trailing))
+            } else if let artist = selectedArtist {
+                BearMusicArtistDetailView(
+                    artist: artist,
+                    viewModel: viewModel,
+                    onBack: { selectedArtist = nil },
+                    selectedAlbum: $selectedAlbum
+                )
+            } else {
+                VStack(spacing: 0) {
+                    Picker("", selection: $selectedTab) {
+                        Text("Home").tag(0)
+                        Text("Albums").tag(1)
+                        Text("Artists").tag(2)
+                        Text("Playlists").tag(3)
+                    }
+                    .pickerStyle(.segmented)
+                    .padding()
+
+                    switch selectedTab {
+                    case 0: BearMusicDiscoverView(viewModel: viewModel, selectedAlbum: $selectedAlbum)
+                    case 1: BearMusicAlbumsView(viewModel: viewModel, selectedAlbum: $selectedAlbum)
+                    case 2: BearMusicArtistsView(viewModel: viewModel, selectedArtist: $selectedArtist)
+                    case 3: BearMusicPlaylistsView(viewModel: viewModel)
+                    default: EmptyView()
+                    }
+
+                    if let song = viewModel.currentSong {
+                        BearMusicNowPlayingBar(viewModel: viewModel, song: song)
+                    }
+                }
+                .task { await viewModel.loadHome() }
             }
         }
-        .animation(.easeInOut(duration: 0.25), value: selectedArtist?.id)
-        .animation(.easeInOut(duration: 0.25), value: selectedAlbum?.id)
-        .task { await viewModel.loadHome() }
     }
 }
 
