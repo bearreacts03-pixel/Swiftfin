@@ -319,7 +319,7 @@ struct BearMusicAlbumDetailView: View {
         .background(Color.black)
         .ignoresSafeArea()
         .toolbar(.hidden, for: .navigationBar)
-#if os(tvOS)
+        #if os(tvOS)
         .onExitCommand { onBack() }
         #endif
         .task { songs = await viewModel.fetchAlbumSongs(albumId: album.id) }
@@ -378,7 +378,7 @@ struct BearMusicArtistDetailView: View {
         .background(Color.black)
         .ignoresSafeArea()
         .toolbar(.hidden, for: .navigationBar)
-#if os(tvOS)
+        #if os(tvOS)
         .onExitCommand { onBack() }
         #endif
         .task {

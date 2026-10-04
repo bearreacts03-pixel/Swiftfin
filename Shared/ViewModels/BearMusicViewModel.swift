@@ -189,6 +189,10 @@ class BearMusicViewModel: ObservableObject {
     }
 
     private func startPlayback(song: BearMusicSong) {
+        #if os(iOS)
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        #endif
         guard let url = streamURL(for: song.id) else { return }
         player?.pause()
         let item = AVPlayerItem(url: url)
