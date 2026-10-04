@@ -5,33 +5,20 @@
 
 import SwiftUI
 
-struct FocusBorderModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        #if os(tvOS)
-        content
-            .overlay(FocusedBorderView())
-        #else
-        content
-        #endif
-    }
-}
-
 #if os(tvOS)
-private struct FocusedBorderView: View {
+struct FocusBorderButtonStyle: PrimitiveButtonStyle {
 
     @Environment(\.isFocused)
     private var isFocused
 
-    var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .stroke(isFocused ? Color.green : Color.clear, lineWidth: 4)
-            .animation(.easeInOut(duration: 0.15), value: isFocused)
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isFocused ? Color.green : Color.clear, lineWidth: 4)
+                    .animation(.easeInOut(duration: 0.15), value: isFocused)
+            )
+            .onTapGesture { configuration.trigger() }
     }
 }
 #endif
-
-extension View {
-    func focusBorder() -> some View {
-        modifier(FocusBorderModifier())
-    }
-}
