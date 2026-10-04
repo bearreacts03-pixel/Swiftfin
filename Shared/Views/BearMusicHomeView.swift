@@ -209,8 +209,8 @@ struct BearMusicArtistsView: View {
             }
             .padding()
         }
-        .task { artists = await viewModel.fetchArtists() }
     }
+    .task { artists = await viewModel.fetchArtists() }
 }
 
 struct BearMusicPlaylistsView: View {
