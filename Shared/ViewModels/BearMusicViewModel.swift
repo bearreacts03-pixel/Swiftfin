@@ -7,7 +7,6 @@
 //
 
 import AVFoundation
-import AVFoundation
 import Combine
 import CryptoKit
 import Foundation
@@ -52,6 +51,9 @@ class BearMusicViewModel: ObservableObject {
     var queue: [BearMusicSong] = []
     @Published
     var queueIndex: Int = 0
+
+    private var player: AVPlayer?
+    private var playerObserver: Any?
 
     init() {
         isLoggedIn = !savedUsername.isEmpty && !savedToken.isEmpty
