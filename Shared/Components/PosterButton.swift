@@ -103,8 +103,6 @@ struct PosterButton<Item: Poster>: View {
         #if os(tvOS)
         .focusedValue(\.focusedPoster, AnyPoster(item))
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(2)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.green, lineWidth: 4))
         .ignoresSafeArea()
         #endif
         .trackingSize($posterSize)
