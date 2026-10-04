@@ -306,6 +306,7 @@ struct SubsonicStatus: Codable {
     let albumList2: AlbumList2?
     let artists: ArtistsContainer?
     let album: BearMusicAlbum?
+    let artist: ArtistDetail?
     let playlists: PlaylistsContainer?
 }
 
@@ -348,6 +349,19 @@ struct AlbumResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case subsonic_response = "subsonic-response"
     }
+}
+
+struct ArtistDetailResponse: Codable {
+    let subsonic_response: SubsonicStatus
+    enum CodingKeys: String, CodingKey {
+        case subsonic_response = "subsonic-response"
+    }
+}
+
+struct ArtistDetail: Codable {
+    let id: String
+    let name: String
+    let album: [BearMusicAlbum]?
 }
 
 struct PlaylistsResponse: Codable {
