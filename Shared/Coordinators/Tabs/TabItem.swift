@@ -138,7 +138,6 @@ extension TabItem {
         }
     }
 
-
     static var bearMusic: TabItem {
         TabItem(
             id: "bear-music",

@@ -1,0 +1,28 @@
+//
+// Swiftfin is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, you can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
+//
+
+import SwiftUI
+
+struct BearMusicView: View {
+
+    @StateObject
+    private var viewModel = BearMusicViewModel()
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if viewModel.isLoggedIn {
+                    BearMusicHomeView(viewModel: viewModel)
+                } else {
+                    BearMusicLoginView(viewModel: viewModel)
+                }
+            }
+            .navigationTitle("Bear Music")
+        }
+    }
+}
