@@ -15,29 +15,32 @@ struct BearMusicHomeView: View {
     private var selectedTab = 0
 
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("Home").tag(0)
-                Text("Albums").tag(1)
-                Text("Artists").tag(2)
-                Text("Playlists").tag(3)
-            }
-            .pickerStyle(.segmented)
-            .padding()
+        NavigationStack {
+            VStack(spacing: 0) {
+                Picker("", selection: $selectedTab) {
+                    Text("Home").tag(0)
+                    Text("Albums").tag(1)
+                    Text("Artists").tag(2)
+                    Text("Playlists").tag(3)
+                }
+                .pickerStyle(.segmented)
+                .padding()
 
-            switch selectedTab {
-            case 0: BearMusicDiscoverView(viewModel: viewModel)
-            case 1: BearMusicAlbumsView(viewModel: viewModel)
-            case 2: BearMusicArtistsView(viewModel: viewModel)
-            case 3: BearMusicPlaylistsView(viewModel: viewModel)
-            default: EmptyView()
-            }
+                switch selectedTab {
+                case 0: BearMusicDiscoverView(viewModel: viewModel)
+                case 1: BearMusicAlbumsView(viewModel: viewModel)
+                case 2: BearMusicArtistsView(viewModel: viewModel)
+                case 3: BearMusicPlaylistsView(viewModel: viewModel)
+                default: EmptyView()
+                }
 
-            if let song = viewModel.currentSong {
-                BearMusicNowPlayingBar(viewModel: viewModel, song: song)
+                if let song = viewModel.currentSong {
+                    BearMusicNowPlayingBar(viewModel: viewModel, song: song)
+                }
             }
+            .navigationTitle("Bear Music")
+            .task { await viewModel.loadHome() }
         }
-        .task { await viewModel.loadHome() }
     }
 }
 
