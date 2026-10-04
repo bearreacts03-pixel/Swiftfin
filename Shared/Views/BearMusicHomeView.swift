@@ -186,7 +186,9 @@ struct BearMusicArtistsView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(artists) { artist in
-                    Button { print("BEARMUSIC ARTIST TAPPED: \(artist.name)"); selectedArtist = artist } label: {
+                    Button { print("BEARMUSIC ARTIST TAPPED: \(artist.name)")
+                        selectedArtist = artist
+                    } label: {
                         VStack(spacing: 8) {
                             AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 150) }) { image in
                                 image.resizable().aspectRatio(1, contentMode: .fill)

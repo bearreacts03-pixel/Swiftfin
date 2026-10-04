@@ -356,16 +356,22 @@ struct AlbumResponse: Codable {
     }
 }
 
+struct ArtistDetailStatus: Codable {
+    let status: String
+    let artist: ArtistDetail?
+}
+
 struct ArtistDetailResponse: Codable {
-    let subsonic_response: SubsonicStatus
+    let subsonicResponse: ArtistDetailStatus
     enum CodingKeys: String, CodingKey {
-        case subsonic_response = "subsonic-response"
+        case subsonicResponse = "subsonic-response"
     }
 }
 
 struct ArtistDetail: Codable {
     let id: String
     let name: String
+    let albumCount: Int?
     let album: [BearMusicAlbum]?
 }
 
