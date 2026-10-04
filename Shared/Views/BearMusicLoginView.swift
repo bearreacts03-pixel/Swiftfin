@@ -33,12 +33,12 @@ struct BearMusicLoginView: View {
 
             VStack(spacing: 12) {
                 TextField("Username", text: $username)
-                    .textFieldStyle(.roundedBorder)
+                    
                     .autocorrectionDisabled()
                     .frame(maxWidth: 400)
 
                 SecureField("Password", text: $password)
-                    .textFieldStyle(.roundedBorder)
+                    
                     .frame(maxWidth: 400)
             }
 

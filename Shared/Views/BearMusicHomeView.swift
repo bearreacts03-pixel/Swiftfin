@@ -1,13 +1,18 @@
 //
-// Bearfin
-// BearMusicHomeView.swift
+// Swiftfin is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, you can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
 
 struct BearMusicHomeView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var selectedTab = 0
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var selectedTab = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -37,7 +42,8 @@ struct BearMusicHomeView: View {
 }
 
 struct BearMusicDiscoverView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
 
     var body: some View {
         ScrollView {
@@ -57,7 +63,8 @@ struct BearMusicDiscoverView: View {
 struct BearMusicAlbumRow: View {
     let title: String
     let albums: [BearMusicAlbum]
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -80,7 +87,8 @@ struct BearMusicAlbumRow: View {
 
 struct BearMusicAlbumCard: View {
     let album: BearMusicAlbum
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -102,8 +110,10 @@ struct BearMusicAlbumCard: View {
 }
 
 struct BearMusicAlbumsView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var albums: [BearMusicAlbum] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var albums: [BearMusicAlbum] = []
     let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     var body: some View {
@@ -125,8 +135,10 @@ struct BearMusicAlbumsView: View {
 }
 
 struct BearMusicArtistsView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var artists: [BearMusicArtist] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var artists: [BearMusicArtist] = []
 
     var body: some View {
         List(artists) { artist in
@@ -153,8 +165,10 @@ struct BearMusicArtistsView: View {
 }
 
 struct BearMusicPlaylistsView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var playlists: [BearMusicPlaylist] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var playlists: [BearMusicPlaylist] = []
 
     var body: some View {
         List(playlists) { playlist in
@@ -182,8 +196,10 @@ struct BearMusicPlaylistsView: View {
 
 struct BearMusicAlbumDetailView: View {
     let album: BearMusicAlbum
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var songs: [BearMusicSong] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var songs: [BearMusicSong] = []
 
     var body: some View {
         ScrollView {
@@ -207,7 +223,9 @@ struct BearMusicAlbumDetailView: View {
                 }
 
                 Button {
-                    if !songs.isEmpty { viewModel.play(song: songs[0], queue: songs) }
+                    if !songs.isEmpty {
+                        viewModel.play(song: songs[0], queue: songs)
+                    }
                 } label: {
                     Label("Play All", systemImage: "play.fill")
                         .padding(.horizontal, 24).padding(.vertical, 12)
@@ -249,7 +267,8 @@ struct BearMusicAlbumDetailView: View {
 }
 
 struct BearMusicNowPlayingBar: View {
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
     let song: BearMusicSong
 
     var body: some View {
