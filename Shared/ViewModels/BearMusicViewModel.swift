@@ -152,6 +152,15 @@ class BearMusicViewModel: ObservableObject {
         } catch { return [] }
     }
 
+    func fetchArtistAlbums(artistId: String) async -> [BearMusicAlbum] {
+        guard let url = URL(string: "\(baseURL)/rest/getArtist?\(authParams())&id=\(artistId)&f=json") else { return [] }
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let response = try JSONDecoder().decode(AlbumListResponse.self, from: data)
+            return response.subsonic_response.albumList2?.album ?? []
+        } catch { return [] }
+    }
+
     func fetchPlaylists() async -> [BearMusicPlaylist] {
         guard let url = URL(string: "\(baseURL)/rest/getPlaylists?\(authParams())&f=json") else { return [] }
         do {

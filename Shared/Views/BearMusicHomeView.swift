@@ -142,20 +142,24 @@ struct BearMusicArtistsView: View {
 
     var body: some View {
         List(artists) { artist in
-            HStack {
-                AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 60) }) { image in
-                    image.resizable().aspectRatio(1, contentMode: .fill)
-                } placeholder: {
-                    Circle().fill(Color.secondary.opacity(0.3))
-                        .overlay(Image(systemName: "music.mic").font(.caption))
-                }
-                .frame(width: 50, height: 50)
-                .clipShape(Circle())
+            NavigationLink {
+                BearMusicArtistDetailView(artist: artist, viewModel: viewModel)
+            } label: {
+                HStack {
+                    AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 60) }) { image in
+                        image.resizable().aspectRatio(1, contentMode: .fill)
+                    } placeholder: {
+                        Circle().fill(Color.secondary.opacity(0.3))
+                            .overlay(Image(systemName: "music.mic").font(.caption))
+                    }
+                    .frame(width: 50, height: 50)
+                    .clipShape(Circle())
 
-                VStack(alignment: .leading) {
-                    Text(artist.name).fontWeight(.semibold)
-                    if let count = artist.albumCount {
-                        Text("\(count) albums").font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .leading) {
+                        Text(artist.name).fontWeight(.semibold)
+                        if let count = artist.albumCount {
+                            Text("\(count) albums").font(.caption).foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
