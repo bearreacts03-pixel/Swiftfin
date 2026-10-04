@@ -322,7 +322,8 @@ struct BearMusicAlbumDetailView: View {
             }
             .padding()
         }
-        .background(Color(UIColor.black.withAlphaComponent(0.95)))
+        .background(Color.black)
+        .edgesIgnoringSafeArea(.all)
         .task { songs = await viewModel.fetchAlbumSongs(albumId: album.id) }
     }
 }
@@ -375,7 +376,8 @@ struct BearMusicArtistDetailView: View {
             }
             .padding()
         }
-        .background(Color(UIColor.black.withAlphaComponent(0.95)))
+        .background(Color.black)
+        .edgesIgnoringSafeArea(.all)
         .task {
             albums = await viewModel.fetchArtistAlbums(artistId: artist.id)
         }
