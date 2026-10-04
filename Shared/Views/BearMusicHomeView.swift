@@ -321,7 +321,8 @@ struct BearMusicAlbumDetailView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding()
+            .padding(.top, 60)
+            .padding(.leading)
         }
         .background(Color.black)
         .ignoresSafeArea()
@@ -375,7 +376,8 @@ struct BearMusicArtistDetailView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding()
+            .padding(.top, 60)
+            .padding(.leading)
         }
         .background(Color.black)
         .ignoresSafeArea()
