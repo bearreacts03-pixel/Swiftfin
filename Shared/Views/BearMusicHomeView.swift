@@ -1,15 +1,22 @@
 //
-// Bearfin
-// BearMusicHomeView.swift
+// Swiftfin is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, you can obtain one at https://mozilla.org/MPL/2.0/.
+//
+// Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
 import SwiftUI
 
 struct BearMusicHomeView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var selectedTab = 0
-    @State private var selectedArtist: BearMusicArtist? = nil
-    @State private var selectedAlbum: BearMusicAlbum? = nil
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var selectedTab = 0
+    @State
+    private var selectedArtist: BearMusicArtist? = nil
+    @State
+    private var selectedAlbum: BearMusicAlbum? = nil
 
     var body: some View {
         ZStack {
@@ -62,17 +69,29 @@ struct BearMusicHomeView: View {
 }
 
 struct BearMusicDiscoverView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @Binding var selectedAlbum: BearMusicAlbum?
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @Binding
+    var selectedAlbum: BearMusicAlbum?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 if !viewModel.recentAlbums.isEmpty {
-                    BearMusicAlbumRow(title: "Recently Added", albums: viewModel.recentAlbums, viewModel: viewModel, selectedAlbum: $selectedAlbum)
+                    BearMusicAlbumRow(
+                        title: "Recently Added",
+                        albums: viewModel.recentAlbums,
+                        viewModel: viewModel,
+                        selectedAlbum: $selectedAlbum
+                    )
                 }
                 if !viewModel.randomAlbums.isEmpty {
-                    BearMusicAlbumRow(title: "Random Pick", albums: viewModel.randomAlbums, viewModel: viewModel, selectedAlbum: $selectedAlbum)
+                    BearMusicAlbumRow(
+                        title: "Random Pick",
+                        albums: viewModel.randomAlbums,
+                        viewModel: viewModel,
+                        selectedAlbum: $selectedAlbum
+                    )
                 }
             }
             .padding()
@@ -83,8 +102,10 @@ struct BearMusicDiscoverView: View {
 struct BearMusicAlbumRow: View {
     let title: String
     let albums: [BearMusicAlbum]
-    @ObservedObject var viewModel: BearMusicViewModel
-    @Binding var selectedAlbum: BearMusicAlbum?
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @Binding
+    var selectedAlbum: BearMusicAlbum?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -105,7 +126,8 @@ struct BearMusicAlbumRow: View {
 
 struct BearMusicAlbumCard: View {
     let album: BearMusicAlbum
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -127,9 +149,12 @@ struct BearMusicAlbumCard: View {
 }
 
 struct BearMusicAlbumsView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @Binding var selectedAlbum: BearMusicAlbum?
-    @State private var albums: [BearMusicAlbum] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @Binding
+    var selectedAlbum: BearMusicAlbum?
+    @State
+    private var albums: [BearMusicAlbum] = []
     let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     var body: some View {
@@ -149,9 +174,12 @@ struct BearMusicAlbumsView: View {
 }
 
 struct BearMusicArtistsView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @Binding var selectedArtist: BearMusicArtist?
-    @State private var artists: [BearMusicArtist] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @Binding
+    var selectedArtist: BearMusicArtist?
+    @State
+    private var artists: [BearMusicArtist] = []
     let columns = [GridItem(.adaptive(minimum: 200), spacing: 16)]
 
     var body: some View {
@@ -185,8 +213,10 @@ struct BearMusicArtistsView: View {
 }
 
 struct BearMusicPlaylistsView: View {
-    @ObservedObject var viewModel: BearMusicViewModel
-    @State private var playlists: [BearMusicPlaylist] = []
+    @ObservedObject
+    var viewModel: BearMusicViewModel
+    @State
+    private var playlists: [BearMusicPlaylist] = []
 
     var body: some View {
         List(playlists) { playlist in
@@ -214,9 +244,11 @@ struct BearMusicPlaylistsView: View {
 
 struct BearMusicAlbumDetailView: View {
     let album: BearMusicAlbum
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
     let onBack: () -> Void
-    @State private var songs: [BearMusicSong] = []
+    @State
+    private var songs: [BearMusicSong] = []
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -235,11 +267,15 @@ struct BearMusicAlbumDetailView: View {
                     VStack(spacing: 4) {
                         Text(album.name).font(.title2).fontWeight(.bold)
                         Text(album.artist ?? "Unknown Artist").foregroundStyle(.secondary)
-                        if let year = album.year { Text(String(year)).foregroundStyle(.secondary).font(.caption) }
+                        if let year = album.year {
+                            Text(String(year)).foregroundStyle(.secondary).font(.caption)
+                        }
                     }
 
                     Button {
-                        if !songs.isEmpty { viewModel.play(song: songs[0], queue: songs) }
+                        if !songs.isEmpty {
+                            viewModel.play(song: songs[0], queue: songs)
+                        }
                     } label: {
                         Label("Play All", systemImage: "play.fill")
                             .padding(.horizontal, 24).padding(.vertical, 12)
@@ -285,17 +321,20 @@ struct BearMusicAlbumDetailView: View {
             }
             .padding()
         }
-        .background(Color(.systemBackground))
+        .background(Color(UIColor.black.withAlphaComponent(0.95)))
         .task { songs = await viewModel.fetchAlbumSongs(albumId: album.id) }
     }
 }
 
 struct BearMusicArtistDetailView: View {
     let artist: BearMusicArtist
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
     let onBack: () -> Void
-    @Binding var selectedAlbum: BearMusicAlbum?
-    @State private var albums: [BearMusicAlbum] = []
+    @Binding
+    var selectedAlbum: BearMusicAlbum?
+    @State
+    private var albums: [BearMusicAlbum] = []
     let columns = [GridItem(.adaptive(minimum: 150), spacing: 16)]
 
     var body: some View {
@@ -335,7 +374,7 @@ struct BearMusicArtistDetailView: View {
             }
             .padding()
         }
-        .background(Color(.systemBackground))
+        .background(Color(UIColor.black.withAlphaComponent(0.95)))
         .task {
             print("BEARMUSIC ARTIST DETAIL: loading albums for \(artist.name) id=\(artist.id)")
             albums = await viewModel.fetchArtistAlbums(artistId: artist.id)
@@ -345,7 +384,8 @@ struct BearMusicArtistDetailView: View {
 }
 
 struct BearMusicNowPlayingBar: View {
-    @ObservedObject var viewModel: BearMusicViewModel
+    @ObservedObject
+    var viewModel: BearMusicViewModel
     let song: BearMusicSong
 
     var body: some View {
