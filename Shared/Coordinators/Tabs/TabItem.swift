@@ -138,6 +138,17 @@ extension TabItem {
         }
     }
 
+
+    static var bearMusic: TabItem {
+        TabItem(
+            id: "bear-music",
+            title: "Bear Music",
+            systemImage: "music.note"
+        ) {
+            BearMusicView()
+        }
+    }
+
     static var settings: TabItem {
         TabItem(
             id: "settings",

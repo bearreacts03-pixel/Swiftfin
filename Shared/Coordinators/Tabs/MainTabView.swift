@@ -34,6 +34,7 @@ struct MainTabView: View {
         TabCoordinator {
             TabItem.contentGroup(provider: DefaultContentGroupProvider())
             TabItem.search
+            TabItem.bearMusic
             TabItem.media
         }
         #else
@@ -50,6 +51,7 @@ struct MainTabView: View {
                 filters: .init(itemTypes: [.movie])
             )
             TabItem.search
+            TabItem.bearMusic
             TabItem.media
             TabItem.settings
         }
