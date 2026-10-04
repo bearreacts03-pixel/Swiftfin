@@ -33,13 +33,13 @@ struct BearMusicLoginView: View {
 
             VStack(spacing: 12) {
                 TextField("Username", text: $username)
-                    
-                    .autocorrectionDisabled()
-                    .frame(maxWidth: 400)
+
+                        .autocorrectionDisabled()
+                        .frame(maxWidth: 400)
 
                 SecureField("Password", text: $password)
-                    
-                    .frame(maxWidth: 400)
+
+                        .frame(maxWidth: 400)
             }
 
             if let error = viewModel.errorMessage {
