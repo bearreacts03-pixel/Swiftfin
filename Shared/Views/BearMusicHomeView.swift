@@ -186,7 +186,7 @@ struct BearMusicArtistsView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(artists) { artist in
-                    Button { selectedArtist = artist } label: {
+                    Button { print("BEARMUSIC ARTIST TAPPED: \(artist.name)"); selectedArtist = artist } label: {
                         VStack(spacing: 8) {
                             AsyncImage(url: artist.coverArt.flatMap { viewModel.coverArtURL(for: $0, size: 150) }) { image in
                                 image.resizable().aspectRatio(1, contentMode: .fill)
@@ -376,7 +376,7 @@ struct BearMusicArtistDetailView: View {
         }
         .background(Color(UIColor.black.withAlphaComponent(0.95)))
         .task {
-            print("BEARMUSIC ARTIST DETAIL: loading albums for \(artist.name) id=\(artist.id)")
+            print("BEARMUSIC ARTIST DETAIL TASK FIRED: loading albums for \(artist.name) id=\(artist.id)")
             albums = await viewModel.fetchArtistAlbums(artistId: artist.id)
             print("BEARMUSIC ARTIST DETAIL: got \(albums.count) albums")
         }
