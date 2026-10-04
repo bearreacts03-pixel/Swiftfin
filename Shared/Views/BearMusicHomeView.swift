@@ -287,7 +287,7 @@ struct BearMusicNowPlayingBar: View {
             }
             Spacer()
             Button {
-                viewModel.isPlaying.toggle()
+                viewModel.togglePlayPause()
             } label: {
                 Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill").font(.title2)
             }

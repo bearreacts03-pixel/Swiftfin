@@ -6,6 +6,8 @@
 // Copyright (c) 2026 Jellyfin & Jellyfin Contributors
 //
 
+import AVFoundation
+import AVFoundation
 import Combine
 import CryptoKit
 import Foundation
@@ -163,7 +165,57 @@ class BearMusicViewModel: ObservableObject {
         self.queue = queue.isEmpty ? [song] : queue
         self.queueIndex = queue.firstIndex(where: { $0.id == song.id }) ?? 0
         self.currentSong = song
-        self.isPlaying = true
+        startPlayback(song: song)
+    }
+
+    private func startPlayback(song: BearMusicSong) {
+        guard let url = streamURL(for: song.id) else { return }
+        player?.pause()
+        let item = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: item)
+        player?.play()
+        isPlaying = true
+
+        // Auto advance to next song when done
+        if let observer = playerObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        playerObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            self?.playNext()
+        }
+    }
+
+    func playNext() {
+        guard queueIndex + 1 < queue.count else {
+            isPlaying = false
+            return
+        }
+        queueIndex += 1
+        let next = queue[queueIndex]
+        currentSong = next
+        startPlayback(song: next)
+    }
+
+    func playPrevious() {
+        guard queueIndex > 0 else { return }
+        queueIndex -= 1
+        let prev = queue[queueIndex]
+        currentSong = prev
+        startPlayback(song: prev)
+    }
+
+    func togglePlayPause() {
+        if isPlaying {
+            player?.pause()
+            isPlaying = false
+        } else {
+            player?.play()
+            isPlaying = true
+        }
     }
 
     func streamURL(for songId: String) -> URL? {
