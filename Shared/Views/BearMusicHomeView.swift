@@ -312,7 +312,7 @@ struct BearMusicAlbumDetailView: View {
                     }
                 }
                 .padding()
-                .padding(.top, 60)
+                .padding(.top, 100)
             }
 
             Button(action: onBack) {
@@ -321,7 +321,7 @@ struct BearMusicAlbumDetailView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding(.top, 60)
+            .padding(.top, 100)
             .padding(.leading)
         }
         .background(Color.black)
@@ -367,7 +367,7 @@ struct BearMusicArtistDetailView: View {
                     .padding()
                 }
                 .padding()
-                .padding(.top, 60)
+                .padding(.top, 100)
             }
 
             Button(action: onBack) {
@@ -376,7 +376,7 @@ struct BearMusicArtistDetailView: View {
                     .background(.ultraThinMaterial)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .padding(.top, 60)
+            .padding(.top, 100)
             .padding(.leading)
         }
         .background(Color.black)
