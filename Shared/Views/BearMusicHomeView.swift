@@ -317,6 +317,7 @@ struct BearMusicAlbumDetailView: View {
             .padding(.leading)
         }
         .background(Color.black)
+            .padding(.bottom, 150)
         .ignoresSafeArea()
         .toolbar(.hidden, for: .navigationBar)
         #if os(tvOS)
